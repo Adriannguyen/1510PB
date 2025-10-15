@@ -1,0 +1,36 @@
+.folder-warning-badge {
+  animation: blink-red-number 1s infinite;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #f5365c !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  min-width: 20px !important;
+  text-align: center;
+  display: inline-block;
+      position: relative;
+      left: -16px;
+}
+
+@keyframes blink-red-number {
+  0% {
+    color: #f5365c !important;
+    transform: scale(1);
+  }
+  50% {
+    color: #ff1744 !important;
+    transform: scale(1.2);
+  }
+  100% {
+    color: #f5365c !important;
+    transform: scale(1);
+  }
+}
+
+/* Đảm bảo badge hiển thị nổi bật */
+.folder-warning-badge:hover {
+  animation: none;
+  color: #ff1744 !important;
+  transform: scale(1.3);
+}
