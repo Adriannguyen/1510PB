@@ -59,6 +59,8 @@ import PaginationControls from "components/PaginationControls/PaginationControls
 import MailDetailsModal from "components/MailDetailsModal/MailDetailsModal.js";
 import MailTable from "components/MailTable/MailTable.js";
 import CompactClock from "components/RealtimeClock/CompactClock.js";
+import SenderFilter from "components/SenderFilter/SenderFilter.js";
+import PICFilter from "components/PICFilter/PICFilter.js";
 import { isMailReplied } from "utils/replyStatusUtils";
 import { API_BASE_URL } from "constants/api.js";
 
@@ -78,6 +80,11 @@ const AllMails = () => {
   const [selectedMails, setSelectedMails] = useState([]); // Selected mails for bulk actions
   const [senderModalOpen, setSenderModalOpen] = useState(false);
   const [selectedSender, setSelectedSender] = useState(null);
+  
+  // Filter states
+  const [filterSenderGroups, setFilterSenderGroups] = useState([]);
+  const [filterSenderEmails, setFilterSenderEmails] = useState([]);
+  const [filterPICs, setFilterPICs] = useState([]);
 
   const {
     mails,

@@ -1,0 +1,134 @@
+/* Column Filter Styles */
+
+.filter-button {
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  min-width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button.active {
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(50, 151, 211, 0.3);
+}
+
+.filter-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.column-filter-popover {
+  min-width: 300px;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #dee2e6;
+}
+
+.column-filter-popover .popover-body {
+  padding: 15px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.filter-header {
+  margin-bottom: 10px;
+}
+
+.filter-header h6 {
+  color: #32325d;
+  font-weight: 600;
+  margin: 0;
+}
+
+.filter-items-list {
+  max-height: 250px;
+  overflow-y: auto;
+  margin: 10px -5px;
+  padding: 5px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.filter-item {
+  padding: 6px 8px;
+  margin: 0;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.filter-item:hover {
+  background-color: #fff;
+}
+
+.filter-item label {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.filter-item-label {
+  margin-left: 8px;
+  font-size: 0.875rem;
+  color: #525f7f;
+  word-break: break-word;
+  flex: 1;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.filter-actions button {
+  font-size: 0.8rem;
+  padding: 5px 12px;
+}
+
+/* Scrollbar styling */
+.filter-items-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-items-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.filter-items-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.filter-items-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Indeterminate checkbox styling */
+input[type="checkbox"]:indeterminate {
+  background-color: #5e72e4;
+  border-color: #5e72e4;
+  opacity: 0.7;
+}
+
+input[type="checkbox"]:indeterminate::after {
+  content: "−";
+  color: white;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  line-height: 1;
+}

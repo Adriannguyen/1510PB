@@ -17,6 +17,8 @@
 */
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "contexts/AuthContext.js";
+import { useState } from "react";
+import AboutUsModal from "components/AboutUsModal/AboutUsModal.js";
 // reactstrap components
 import {
   DropdownMenu,
@@ -38,6 +40,9 @@ import {
 const AdminNavbar = (props) => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const [isAboutUsOpen, setIsAboutUsOpen] = useState(false);
+
+  const toggleAboutUs = () => setIsAboutUsOpen(!isAboutUsOpen);
 
   const handleLogout = () => {
     logout();
@@ -104,11 +109,11 @@ const AdminNavbar = (props) => {
                   <i className="ni ni-single-02" />
                   <span>My profile</span>
                 </DropdownItem>
-                <DropdownItem to="/admin/user-profile" tag={Link}>
+                <DropdownItem to="/admin/change-password" tag={Link}>
                   <i className="ni ni-lock-circle-open" />
                   <span>Change Password</span>
                 </DropdownItem>
-                <DropdownItem to="/admin/user-profile" tag={Link}>
+                <DropdownItem onClick={toggleAboutUs}>
                   <i className="ni ni-paper-diploma" />
                   <span>About Us</span>
                 </DropdownItem>
@@ -126,6 +131,9 @@ const AdminNavbar = (props) => {
           </Nav>
         </Container>
       </Navbar>
+
+      {/* About Us Modal */}
+      <AboutUsModal isOpen={isAboutUsOpen} toggle={toggleAboutUs} />
     </>
   );
 };

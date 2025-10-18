@@ -349,14 +349,12 @@ const MailTable = ({
               {mailType === "review" && (
                 <td>
                   {(() => {
-                    // Check if reply status is "Processed" - if so, don't show original status
-                    const isReplied = getReplyStatusFromMail(mail);
-                    if (isReplied) {
-                      return null; // Return null to show empty content when Reply Status is Processed
-                    }
-
+                    // NEW LOGIC: ALWAYS show Original Category for ALL review mails
+                    // Reason: All mails from Valid/Expired now go to "processed" folder
+                    // We still need to show their original category (Valid/Expired)
+                    
                     // Use getOriginalCategory utility function
-                    // This calculates based on Date sent (within 24h = Valid, over 24h = Expired)
+                    // This reads mail.originalCategory or calculates from Date sent
                     const status = getOriginalCategory(mail);
 
                     return (

@@ -1,0 +1,116 @@
+/* PIC Filter Styles */
+
+.pic-filter-popover {
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #dee2e6;
+}
+
+.pic-filter-popover .popover-body {
+  padding: 15px;
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+.pic-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.pic-item {
+  padding: 8px;
+  margin: 0;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pic-item:last-child {
+  border-bottom: none;
+}
+
+.pic-item:hover {
+  background-color: #fff;
+}
+
+.pic-item label {
+  margin: 0;
+  display: block;
+  cursor: pointer;
+  width: 100%;
+}
+
+.filter-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-left: 8px;
+}
+
+.pic-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.pic-name {
+  font-size: 0.875rem;
+  color: #32325d;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pic-email {
+  font-size: 0.75rem;
+  margin-top: 2px;
+  padding-left: 28px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-summary {
+  font-size: 0.8rem;
+  border: 1px solid #e9ecef;
+}
+
+/* Badge styling */
+.pic-item .badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+/* Scrollbar for PIC list */
+.pic-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pic-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.pic-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.pic-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Highlight first item (Unassigned) if present */
+.pic-item:first-child {
+  background-color: #f8f9fe;
+}
+
+.pic-item:first-child:hover {
+  background-color: #fff;
+}

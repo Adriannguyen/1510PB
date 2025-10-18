@@ -147,8 +147,14 @@ export const calculateOriginalCategory = (mail) => {
  * @returns {Object} - { text: "Valid"|"Expired"|"Unknown", color: string }
  */
 export const getOriginalCategory = (mail) => {
-  // If originalCategory is explicitly set (from when mail was moved to review)
+  // If originalCategory is explicitly set from backend (auto-updated hourly)
   if (mail.originalCategory) {
+    if (mail.originalCategory === "Valid") {
+      return { text: "Valid", color: "success" };
+    } else if (mail.originalCategory === "Expired") {
+      return { text: "Expired", color: "danger" };
+    }
+    // Legacy support for old format
     if (mail.originalCategory === "DungHan") {
       return { text: "Valid", color: "success" };
     } else if (mail.originalCategory === "QuaHan") {
@@ -156,6 +162,6 @@ export const getOriginalCategory = (mail) => {
     }
   }
 
-  // Calculate from Date sent (for mails added directly to review)
+  // Fallback: Calculate from Date sent if originalCategory not set
   return calculateOriginalCategory(mail);
 };

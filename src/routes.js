@@ -33,6 +33,8 @@ import GroupManagement from "views/GroupManagement.js";
 import PaginationDemo from "views/PaginationDemo.js";
 import AdminTest from "views/AdminTest.jsx";
 import DecryptionTest from "views/DecryptionTest.js";
+import ChangePassword from "views/ChangePassword.js";
+import AboutUs from "views/AboutUs.js";
 
 var routes = [
   {
@@ -101,6 +103,21 @@ var routes = [
     component: <Profile />,
     layout: "/admin",
     invisible: true,
+  },
+  {
+    path: "/change-password",
+    name: "Change Password",
+    icon: "ni ni-lock-circle-open text-primary",
+    component: <ChangePassword />,
+    layout: "/admin",
+  },
+  {
+    path: "/about-us",
+    name: "About Us",
+    icon: "ni ni-world-2 text-info",
+    component: <AboutUs />,
+    layout: "/admin",
+    invisible: true, // Hidden from sidebar, accessible via modal
   },
   {
     path: "/login",

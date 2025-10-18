@@ -60,25 +60,34 @@ export const useMailData = () => {
     const newSocket = io(API_BASE_URL);
     setSocket(newSocket);
 
-    // Listen for mail stats updates - AUTO-RELOAD DISABLED
+    // Listen for mail stats updates
     newSocket.on("mailStatsUpdate", (stats) => {
       console.log("📡 Received mail stats update:", stats);
-      // Auto-reload disabled for performance
-      // loadData();
+      loadData();
     });
 
-    // Listen for new mails detected - AUTO-RELOAD DISABLED
+    // Listen for new mails detected
     newSocket.on("newMailsDetected", (data) => {
       console.log("🆕 New mails detected:", data);
-      // Auto-reload disabled for performance
-      // loadData();
+      loadData();
     });
 
-    // Listen for mail moved events - AUTO-RELOAD DISABLED
+    // Listen for mail moved events
     newSocket.on("mailMoved", (data) => {
       console.log("📧 Mail moved:", data);
-      // Auto-reload disabled for performance
-      // loadData();
+      loadData();
+    });
+
+    // Listen for mailsUpdated events (when files added/changed manually)
+    newSocket.on("mailsUpdated", (data) => {
+      console.log("� Mails updated:", data);
+      loadData();
+    });
+
+    // Listen for mailAssigned events (when auto-assignment happens)
+    newSocket.on("mailAssigned", (data) => {
+      console.log("👤 Mail assigned:", data);
+      loadData();
     });
 
     // Cleanup on unmount

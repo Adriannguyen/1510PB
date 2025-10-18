@@ -1,0 +1,55 @@
+/* Sender Filter Styles */
+
+.sender-filter-popover {
+  min-width: 350px;
+  max-width: 450px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #dee2e6;
+}
+
+.sender-filter-popover .popover-body {
+  padding: 15px;
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+.sender-filter-popover .nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+}
+
+.sender-filter-popover .nav-link {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: #525f7f;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.sender-filter-popover .nav-link:hover {
+  background-color: #f6f9fc;
+  border-bottom-color: #5e72e4;
+}
+
+.sender-filter-popover .nav-link.active {
+  color: #5e72e4;
+  font-weight: 600;
+  border-bottom-color: #5e72e4;
+  background-color: transparent;
+}
+
+.sender-filter-popover .badge {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  vertical-align: middle;
+}
+
+.sender-filter-popover .filter-item-label small {
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+.sender-filter-popover .alert {
+  border-radius: 4px;
+  margin-bottom: 10px;
+}

@@ -128,6 +128,38 @@ const verifyPassword = (password, salt, hash) => {
   }
 };
 
+// Helper function to calculate original category for review mails
+const calculateOriginalCategory = (mailDate) => {
+  try {
+    if (!mailDate) {
+      return null;
+    }
+
+    let parsedDate;
+    if (Array.isArray(mailDate)) {
+      // Format: ["YYYY-MM-DD", "HH:MM"]
+      const [datePart, timePart] = mailDate;
+      parsedDate = new Date(`${datePart}T${timePart || "00:00"}:00`);
+    } else {
+      parsedDate = new Date(mailDate);
+    }
+
+    if (isNaN(parsedDate.getTime())) {
+      return null;
+    }
+
+    const currentTime = new Date();
+    const timeDifference = currentTime - parsedDate;
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+    // Less than 24 hours = Valid, otherwise Expired
+    return hoursDifference < 24 ? "Valid" : "Expired";
+  } catch (error) {
+    console.error("Error calculating original category:", error);
+    return null;
+  }
+};
+
 // Helper function to determine reply status from folder structure
 const getReplyStatusFromFolder = (filePath, category, status) => {
   // Determine reply status based on folder structure
@@ -804,105 +836,143 @@ const scanMailDirectory = () => {
 };
 
 /**
- * Auto-expire Review Mails that are over 24 hours old
- * Moves mails from ReviewMail/pending to ReviewMail/processed
- * Changes status from Valid to Expired in Original Category
+ * Auto-update Original Category for Review Mails based on date
+ * DOES NOT move files between folders
+ * Only updates originalCategory field: Valid (<24h) or Expired (>24h)
  */
 const autoExpireReviewMails = () => {
   try {
-    console.log("🕐 Starting auto-expire review mails check...");
+    console.log("🕐 Starting auto-update review mails original category...");
 
     const pendingPath = path.join(MAIL_DATA_PATH, "ReviewMail", "pending");
+    const processedPath = path.join(MAIL_DATA_PATH, "ReviewMail", "processed");
 
-    if (!fs.existsSync(pendingPath)) {
-      console.log(
-        "📂 ReviewMail/pending folder not found, skipping auto-expire"
-      );
-      return { expiredCount: 0, errors: [] };
-    }
-
-    const files = fs
-      .readdirSync(pendingPath)
-      .filter((file) => file.endsWith(".json"));
-    let expiredCount = 0;
+    let updatedCount = 0;
     const errors = [];
-
     const currentTime = new Date();
     const THRESHOLD_HOURS = 24;
 
-    for (const file of files) {
-      try {
-        const filePath = path.join(pendingPath, file);
-        const mailData = readJsonFile(filePath);
+    // Process pending folder
+    if (fs.existsSync(pendingPath)) {
+      const pendingFiles = fs
+        .readdirSync(pendingPath)
+        .filter((file) => file.endsWith(".json"));
 
-        if (!mailData || !mailData.Date) {
-          continue;
-        }
+      for (const file of pendingFiles) {
+        try {
+          const filePath = path.join(pendingPath, file);
+          const mailData = readJsonFile(filePath);
 
-        // Parse mail date
-        const mailDate = new Date(mailData.Date);
-        if (isNaN(mailDate.getTime())) {
-          console.warn(`⚠️ Invalid date for mail: ${file}`);
-          continue;
-        }
-
-        // Calculate time difference in hours
-        const timeDifference = currentTime - mailDate;
-        const hoursDifference = timeDifference / (1000 * 60 * 60);
-
-        // Check if mail is over 24 hours old
-        if (hoursDifference >= THRESHOLD_HOURS) {
-          console.log(
-            `⏰ Mail "${mailData.Subject}" is ${hoursDifference.toFixed(
-              1
-            )} hours old - moving to processed`
-          );
-
-          // Move mail from pending to processed
-          const processedPath = path.join(
-            MAIL_DATA_PATH,
-            "ReviewMail",
-            "processed"
-          );
-
-          // Ensure processed folder exists
-          if (!fs.existsSync(processedPath)) {
-            fs.mkdirSync(processedPath, { recursive: true });
+          if (!mailData || !mailData.Date) {
+            continue;
           }
 
-          const newFilePath = path.join(processedPath, file);
+          // Parse mail date
+          let mailDate;
+          if (Array.isArray(mailData.Date)) {
+            // Format: ["YYYY-MM-DD", "HH:MM"]
+            const [datePart, timePart] = mailData.Date;
+            mailDate = new Date(`${datePart}T${timePart || "00:00"}:00`);
+          } else {
+            mailDate = new Date(mailData.Date);
+          }
 
-          // Update mail data to mark as expired
-          const updatedMailData = {
-            ...mailData,
-            status: "processed",
-            autoExpired: true,
-            expiredAt: currentTime.toISOString(),
-            filePath: newFilePath.replace(/\\/g, "/"),
-          };
+          if (isNaN(mailDate.getTime())) {
+            console.warn(`⚠️ Invalid date for mail: ${file}`);
+            continue;
+          }
 
-          // Write to new location
-          writeJsonFile(newFilePath, updatedMailData);
+          // Calculate time difference in hours
+          const timeDifference = currentTime - mailDate;
+          const hoursDifference = timeDifference / (1000 * 60 * 60);
 
-          // Delete from old location
-          fs.unlinkSync(filePath);
+          // Determine original category based on time
+          const newCategory = hoursDifference < THRESHOLD_HOURS ? "Valid" : "Expired";
+          const oldCategory = mailData.originalCategory;
 
-          expiredCount++;
-          console.log(`✅ Moved mail "${mailData.Subject}" to processed`);
+          // Only update if category changed
+          if (oldCategory !== newCategory) {
+            console.log(
+              `🔄 Updating "${mailData.Subject}": ${oldCategory || "None"} → ${newCategory} (${hoursDifference.toFixed(1)}h old)`
+            );
+
+            // Update mail data with new original category
+            // KHÔNG MOVE FILE - CHỈ CẬP NHẬT DATA
+            const updatedMailData = {
+              ...mailData,
+              originalCategory: newCategory,
+              lastCategoryUpdate: currentTime.toISOString(),
+              filePath: filePath.replace(/\\/g, "/"),
+            };
+
+            // Save updated mail IN THE SAME LOCATION
+            writeJsonFile(filePath, updatedMailData);
+            updatedCount++;
+          }
+        } catch (error) {
+          console.error(`❌ Error processing file ${file}:`, error);
+          errors.push({ file, error: error.message });
         }
-      } catch (error) {
-        console.error(`❌ Error processing file ${file}:`, error);
-        errors.push({ file, error: error.message });
       }
     }
 
-    if (expiredCount > 0) {
-      console.log(`🎯 Auto-expired ${expiredCount} review mail(s)`);
-    } else {
-      console.log(`✅ No review mails to auto-expire`);
+    // Also check processed folder (for completeness)
+    if (fs.existsSync(processedPath)) {
+      const processedFiles = fs
+        .readdirSync(processedPath)
+        .filter((file) => file.endsWith(".json"));
+
+      for (const file of processedFiles) {
+        try {
+          const filePath = path.join(processedPath, file);
+          const mailData = readJsonFile(filePath);
+
+          if (!mailData || !mailData.Date) {
+            continue;
+          }
+
+          let mailDate;
+          if (Array.isArray(mailData.Date)) {
+            const [datePart, timePart] = mailData.Date;
+            mailDate = new Date(`${datePart}T${timePart || "00:00"}:00`);
+          } else {
+            mailDate = new Date(mailData.Date);
+          }
+
+          if (isNaN(mailDate.getTime())) {
+            continue;
+          }
+
+          const timeDifference = currentTime - mailDate;
+          const hoursDifference = timeDifference / (1000 * 60 * 60);
+          const newCategory = hoursDifference < THRESHOLD_HOURS ? "Valid" : "Expired";
+          const oldCategory = mailData.originalCategory;
+
+          if (oldCategory !== newCategory) {
+            const updatedMailData = {
+              ...mailData,
+              originalCategory: newCategory,
+              lastCategoryUpdate: currentTime.toISOString(),
+              filePath: filePath.replace(/\\/g, "/"),
+            };
+
+            writeJsonFile(filePath, updatedMailData);
+            updatedCount++;
+          }
+        } catch (error) {
+          console.error(`❌ Error processing file ${file}:`, error);
+          errors.push({ file, error: error.message });
+        }
+      }
     }
 
-    return { expiredCount, errors };
+    if (updatedCount > 0) {
+      console.log(`✅ Updated originalCategory for ${updatedCount} review mail(s)`);
+    } else {
+      console.log(`✔️ No category updates needed`);
+    }
+
+    return { expiredCount: updatedCount, errors };
   } catch (error) {
     console.error("❌ Error in autoExpireReviewMails:", error);
     return { expiredCount: 0, errors: [{ error: error.message }] };
@@ -927,6 +997,13 @@ const checkForNewMails = () => {
 
       // Broadcast updated stats
       broadcastToClients("mailStatsUpdate", mailStats);
+
+      // ✅ ALWAYS emit mailsUpdated when there are changes (for real-time updates)
+      broadcastToClients("mailsUpdated", {
+        type: "fileSystemChange",
+        timestamp: new Date().toISOString(),
+        stats: newStats,
+      });
 
       if (hasNewMails) {
         console.log(`🆕 New mails detected! Count: ${newStats.newMails}`);
@@ -1414,6 +1491,9 @@ const loadAllMails = () => {
           const mailId =
             mailData.id || enrichedMail.id || path.parse(file).name || fileId++;
 
+          // Calculate originalCategory based on Date
+          const originalCategory = calculateOriginalCategory(mailData.Date);
+
           // Status determined from folder path - no need to add status field
           // Frontend will determine status from filePath
 
@@ -1422,7 +1502,9 @@ const loadAllMails = () => {
             fileName: file,
             filePath: filePath,
             category: "ReviewMail",
-            // status: determined from folder path in frontend
+            status: "pending",
+            originalCategory: originalCategory, // Add original category
+            // isExpired: determined by originalCategory
             isExpired: false,
             isReplied: getReplyStatusFromFolder(
               filePath,
@@ -1433,7 +1515,7 @@ const loadAllMails = () => {
           });
 
           console.log(
-            `[Debug] Loaded ReviewMail/pending: id=${mailId}, file=${file}`
+            `[Debug] Loaded ReviewMail/pending: id=${mailId}, file=${file}, originalCategory=${originalCategory}`
           );
         }
       });
@@ -1460,6 +1542,10 @@ const loadAllMails = () => {
           const mailId =
             mailData.id || enrichedMail.id || path.parse(file).name || fileId++;
 
+          // Processed mails don't show originalCategory on UI
+          // But we can still calculate it for internal tracking
+          const originalCategory = calculateOriginalCategory(mailData.Date);
+
           // Status determined from folder path - no need to add status field
           // Frontend will determine status from filePath
 
@@ -1468,7 +1554,9 @@ const loadAllMails = () => {
             fileName: file,
             filePath: filePath,
             category: "ReviewMail",
-            // status: determined from folder path in frontend
+            status: "processed",
+            originalCategory: originalCategory, // Add but won't display in UI
+            // isExpired: determined by originalCategory
             isExpired: false,
             isReplied: getReplyStatusFromFolder(
               filePath,
@@ -1899,6 +1987,13 @@ watcher
       return;
     }
 
+    // ✅ Emit immediate update event for ANY file addition
+    broadcastToClients("mailsUpdated", {
+      type: "fileAdded",
+      fileName: path.basename(filePath),
+      timestamp: new Date().toISOString(),
+    });
+
     // Define all folders to monitor for auto-assignment
     const autoAssignFolders = [
       {
@@ -2023,13 +2118,29 @@ watcher
   })
   .on("change", (filePath) => {
     if (filePath.endsWith(".json")) {
-      console.log(`📁 File changed: ${path.basename(filePath)}`);
+      console.log(`� File changed: ${path.basename(filePath)}`);
+      
+      // Emit immediate update event
+      broadcastToClients("mailsUpdated", {
+        type: "fileChanged",
+        fileName: path.basename(filePath),
+        timestamp: new Date().toISOString(),
+      });
+      
       setTimeout(checkForNewMails, 500);
     }
   })
   .on("unlink", (filePath) => {
     if (filePath.endsWith(".json")) {
-      console.log(`📁 File deleted: ${path.basename(filePath)}`);
+      console.log(`�️ File deleted: ${path.basename(filePath)}`);
+      
+      // Emit immediate update event
+      broadcastToClients("mailsUpdated", {
+        type: "fileDeleted",
+        fileName: path.basename(filePath),
+        timestamp: new Date().toISOString(),
+      });
+      
       setTimeout(checkForNewMails, 500);
     }
   });
@@ -3255,51 +3366,18 @@ app.post("/api/move-to-review", (req, res) => {
 
     console.log(`� Found file at: ${actualFilePath}`);
 
-    // Step 2: Determine target folder based on CURRENT location
-    let targetReviewFolder = "pending"; // default
-    let shouldMarkAsReplied = false;
+    // Step 2: NEW LOGIC - ALL mails from Valid/Expired → processed folder
+    // Reason: When moving from Valid/Expired Mails, they are considered "Processed" for review
+    const targetReviewFolder = "processed"; // Always processed when moving from Valid/Expired
+    const shouldMarkAsReplied = true; // Always mark as replied/processed
 
-    console.log(`🔍 Checking file path: ${actualFilePath}`);
-    console.log(`🔍 Lower case path: ${actualFilePath.toLowerCase()}`);
+    console.log(`🎯 NEW LOGIC: All mails from Valid/Expired → processed folder`);
+    console.log(`🎯 Target ReviewMail folder: ${targetReviewFolder}`);
+    console.log(`🎯 Will be marked as: Processed (replied)`);
 
-    // Check if file is from "replied" folders (case insensitive)
-    const lowerPath = actualFilePath.toLowerCase();
-
-    // Check for SPECIFIC REPLIED folders first (more specific patterns)
-    if (
-      lowerPath.includes("\\rep\\") ||
-      lowerPath.includes("/rep/") ||
-      lowerPath.includes("\\darep\\") ||
-      lowerPath.includes("/darep/") ||
-      lowerPath.endsWith("\\rep") ||
-      lowerPath.endsWith("/rep")
-    ) {
-      // Files from "replied" folders go to processed
-      targetReviewFolder = "processed";
-      shouldMarkAsReplied = true;
-      console.log(`🎯 From replied folder → processed`);
-    } else if (
-      lowerPath.includes("\\mustrep\\") ||
-      lowerPath.includes("/mustrep/") ||
-      lowerPath.includes("\\chuarep\\") ||
-      lowerPath.includes("/chuarep/") ||
-      lowerPath.endsWith("\\mustrep") ||
-      lowerPath.endsWith("/mustrep") ||
-      lowerPath.endsWith("\\chuarep") ||
-      lowerPath.endsWith("/chuarep")
-    ) {
-      // Files from "unreplied" folders go to pending
-      targetReviewFolder = "pending";
-      shouldMarkAsReplied = false;
-      console.log(`🎯 From unreplied folder → pending`);
-    } else {
-      // Default: pending for unknown locations
-      console.log(`⚠️  Unknown location, using default: pending`);
-    }
-
-    console.log(
-      `🎯 Target ReviewMail folder: ${targetReviewFolder} (based on current location)`
-    );
+    // Calculate Original Category based on current time vs Date sent
+    const originalCategory = calculateOriginalCategory(mailData.Date);
+    console.log(`📊 Calculated Original Category: ${originalCategory} (based on Date sent)`);
 
     // Create target ReviewMail directory if it doesn't exist
     const reviewMailTargetPath = path.join(
@@ -3324,11 +3402,10 @@ app.post("/api/move-to-review", (req, res) => {
       ...mailData,
       category: "ReviewMail",
       dateMoved: [dateStr, timeStr], // Always use current date/time when moving to review
-      originalCategory:
-        mailData.originalCategory || mailData.category || "Unknown",
-      originalStatus: mailData.originalStatus || mailData.status || "Unknown",
-      isReplied: shouldMarkAsReplied, // Mark as replied only if already replied
-      processedDate: shouldMarkAsReplied ? now.toISOString() : undefined, // Add timestamp only if processed
+      originalCategory: originalCategory, // "Valid" or "Expired" based on Date sent calculation
+      originalStatus: mailData.status || "Unknown", // Keep original status (mustRep/rep/chuaRep/daRep)
+      isReplied: shouldMarkAsReplied, // Always true (processed)
+      processedDate: now.toISOString(), // Always add timestamp when moving to processed
     };
 
     // Remove any existing dateMoved from original mail data to ensure fresh timestamp
@@ -3460,16 +3537,24 @@ app.post("/api/move-back-from-review", (req, res) => {
 
     // Determine target status based on original category and current review status
     let targetStatus;
-    let targetCategory = mailData.originalCategory;
+    let targetCategory;
 
-    if (targetCategory === "DungHan") {
-      // Valid mails: processed -> rep, pending -> mustRep
+    // Convert originalCategory to folder category
+    // New format: "Valid" or "Expired" (updated hourly by autoUpdateCategoryJob)
+    // Legacy format: "DungHan" or "QuaHan" (from old system)
+    // 
+    // IMPORTANT: Since all mails from Valid/Expired now go to "processed" folder,
+    // they will ALWAYS move back to Replied folders (rep/daRep)
+    if (mailData.originalCategory === "Valid" || mailData.originalCategory === "DungHan") {
+      // Valid mails: processed → rep (ALWAYS since all moved mails are processed)
+      targetCategory = "DungHan";
       targetStatus = currentReviewStatus === "processed" ? "rep" : "mustRep";
-    } else if (targetCategory === "QuaHan") {
-      // Expired mails: processed -> daRep, pending -> chuaRep
+    } else if (mailData.originalCategory === "Expired" || mailData.originalCategory === "QuaHan") {
+      // Expired mails: processed → daRep (ALWAYS since all moved mails are processed)
+      targetCategory = "QuaHan";
       targetStatus = currentReviewStatus === "processed" ? "daRep" : "chuaRep";
     } else {
-      // Fallback: determine by isExpired
+      // Fallback: determine by isExpired or Date calculation
       if (mailData.isExpired) {
         targetCategory = "QuaHan";
         targetStatus =
@@ -3503,14 +3588,15 @@ app.post("/api/move-back-from-review", (req, res) => {
       ...mailData,
       category: targetCategory,
       status: targetStatus,
-      isReplied: currentReviewStatus === "processed", // Set based on ReviewMail status
-      isExpired: mailData.originalCategory === "QuaHan", // Set isExpired based on originalCategory
+      isReplied: currentReviewStatus === "processed", // ALWAYS true since all mails go to processed
+      isExpired: targetCategory === "QuaHan", // Set isExpired based on target category (QuaHan = expired)
     };
 
     // Remove review-specific fields
     delete restoredMailData.dateMoved;
     delete restoredMailData.originalCategory;
     delete restoredMailData.originalStatus;
+    delete restoredMailData.processedDate;
 
     // Generate filename for restored mail - preserve original filename/ID
     let fileName = mailData.fileName;
@@ -5227,26 +5313,29 @@ server.listen(PORT, "0.0.0.0", () => {
   mailStats = scanMailDirectory();
   console.log("📊 Initial mail stats loaded");
 
-  // Run auto-expire check immediately on startup
-  console.log("🕐 Running initial auto-expire check...");
+  // Run auto-update original category check immediately on startup
+  console.log("🕐 Running initial review mails category update...");
   autoExpireReviewMails();
 
-  // Set up auto-expire job to run every hour
-  const AUTO_EXPIRE_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
+  // Set up auto-update job to run every hour
+  const AUTO_UPDATE_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
   setInterval(() => {
-    console.log("🕐 Running scheduled auto-expire check...");
+    console.log("🕐 Running scheduled review mails category update...");
     const result = autoExpireReviewMails();
     if (result.expiredCount > 0) {
       // Broadcast update to all clients
       broadcastToClients("mailsUpdated", {
-        type: "autoExpired",
+        type: "categoryUpdated",
         count: result.expiredCount,
         timestamp: new Date().toISOString(),
       });
+      
+      // Rescan to update stats
+      mailStats = scanMailDirectory();
     }
-  }, AUTO_EXPIRE_INTERVAL);
+  }, AUTO_UPDATE_INTERVAL);
 
-  console.log("⏰ Auto-expire job scheduled (runs every hour)");
+  console.log("⏰ Auto-update category job scheduled (runs every hour)");
 });
 
 // Graceful shutdown

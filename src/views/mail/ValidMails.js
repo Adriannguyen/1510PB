@@ -60,6 +60,8 @@ import PaginationControls from "components/PaginationControls/PaginationControls
 import MailDetailsModal from "components/MailDetailsModal/MailDetailsModal.js";
 import MailTable from "components/MailTable/MailTable.js";
 import AddSenderToGroupModal from "components/AddSenderToGroupModal/AddSenderToGroupModal.js";
+import SenderFilter from "components/SenderFilter/SenderFilter.js";
+import PICFilter from "components/PICFilter/PICFilter.js";
 import { API_BASE_URL } from "constants/api";
 import { isMailReplied } from "utils/replyStatusUtils";
 
@@ -79,6 +81,11 @@ const ValidMails = () => {
   const [selectedMails, setSelectedMails] = useState([]); // Selected mails for bulk actions
   const [senderModalOpen, setSenderModalOpen] = useState(false); // State for Sender Modal
   const [selectedSender, setSelectedSender] = useState(null); // Selected sender email
+  
+  // Filter states
+  const [filterSenderGroups, setFilterSenderGroups] = useState([]); // Selected sender groups
+  const [filterSenderEmails, setFilterSenderEmails] = useState([]); // Selected sender emails
+  const [filterPICs, setFilterPICs] = useState([]); // Selected PICs
 
   const validMails = useValidMails();
   const {
@@ -118,6 +125,36 @@ const ValidMails = () => {
     setTimeout(() => {
       setExpiredMovedAlert(null);
     }, 3000);
+  };
+
+  // Handle sender filter apply
+  const handleSenderFilterApply = ({ groups, emails }) => {
+    console.log("🔍 Sender filter applied:", { groups, emails });
+    setFilterSenderGroups(groups);
+    setFilterSenderEmails(emails);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  // Handle sender filter clear
+  const handleSenderFilterClear = () => {
+    console.log("🔍 Sender filter cleared");
+    setFilterSenderGroups([]);
+    setFilterSenderEmails([]);
+    setCurrentPage(1);
+  };
+
+  // Handle PIC filter apply
+  const handlePICFilterApply = (selectedPICs) => {
+    console.log("🔍 PIC filter applied:", selectedPICs);
+    setFilterPICs(selectedPICs);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  // Handle PIC filter clear
+  const handlePICFilterClear = () => {
+    console.log("🔍 PIC filter cleared");
+    setFilterPICs([]);
+    setCurrentPage(1);
   };
 
   // Handle assign mail
@@ -599,10 +636,46 @@ const ValidMails = () => {
       if (replyStatusFilter === "not_replied")
         matchesReplyStatus = !isMailReplied(mail);
 
+      // Sender filter
+      let matchesSender = true;
+      if (filterSenderGroups.length > 0 || filterSenderEmails.length > 0) {
+        const sender = mail.From || mail.from || mail.EncryptedFrom;
+        const groupInfo = getGroupInfo(sender);
+        
+        // Check if matches selected groups
+        const matchesGroup = filterSenderGroups.length === 0 || 
+          (groupInfo && filterSenderGroups.includes(groupInfo.groupId));
+        
+        // Check if matches selected emails
+        const matchesEmail = filterSenderEmails.length === 0 || 
+          filterSenderEmails.includes(sender);
+        
+        // Must match both (if both filters are active)
+        if (filterSenderGroups.length > 0 && filterSenderEmails.length > 0) {
+          matchesSender = matchesGroup && matchesEmail;
+        } else {
+          matchesSender = matchesGroup || matchesEmail;
+        }
+      }
+
+      // PIC filter
+      let matchesPIC = true;
+      if (filterPICs.length > 0) {
+        if (filterPICs.includes("__unassigned__")) {
+          // Include unassigned mails
+          matchesPIC = !mail.assignedTo || 
+            filterPICs.includes(mail.assignedTo.picId);
+        } else {
+          // Only check assigned PICs
+          matchesPIC = mail.assignedTo && 
+            filterPICs.includes(mail.assignedTo.picId);
+        }
+      }
+
       // Note: Removed automatic expiry filter - mails stay in valid section until manually moved
       // const withinDeadline = !isMailExpired(mail.Date);
 
-      return matchesSearch && matchesDate && matchesReplyStatus;
+      return matchesSearch && matchesDate && matchesReplyStatus && matchesSender && matchesPIC;
     })
     .sort((a, b) => {
       // Sort by Date field - newest first
@@ -769,27 +842,24 @@ const ValidMails = () => {
                     </h3>
                   </div>
                   <div className="col-auto">
-                    {/* <Button
-                      color="secondary"
-                      size="sm"
-                      onClick={handleRefreshPics}
-                      title="Refresh PIC data"
-                      className="ml-2"
-                    >
-                      <i className="fas fa-user-sync mr-1" />
-                      Refresh PICs
-                    </Button> */}
-                    {/* <Button
-                      color="primary"
-                      size="sm"
-                      onClick={handleAutoAssignPICs}
-                      className="ml-2"
-                      disabled={selectedMails.length === 0}
-                      title={`Auto-assign ${selectedMails.length} selected mail(s) to leader PICs based on sender domain`}
-                    >
-                      <i className="fas fa-magic mr-1" />
-                      Auto-assign PIC ({selectedMails.length})
-                    </Button> */}
+                    {/* Column Filters */}
+                    <div className="d-inline-block mr-2">
+                      <SenderFilter
+                        mails={validMails}
+                        selectedGroups={filterSenderGroups}
+                        selectedPersonalEmails={filterSenderEmails}
+                        onApply={handleSenderFilterApply}
+                        onClear={handleSenderFilterClear}
+                      />
+                    </div>
+                    <div className="d-inline-block mr-2">
+                      <PICFilter
+                        mails={validMails}
+                        selectedPICs={filterPICs}
+                        onApply={handlePICFilterApply}
+                        onClear={handlePICFilterClear}
+                      />
+                    </div>
                     <Button
                       color="info"
                       size="sm"
