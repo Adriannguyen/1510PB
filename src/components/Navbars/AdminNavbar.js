@@ -107,15 +107,15 @@ const AdminNavbar = (props) => {
                 </DropdownItem>
                 <DropdownItem to="/admin/user-profile" tag={Link}>
                   <i className="ni ni-single-02" />
-                  <span>My profile</span>
+                  <span>Profile</span>
                 </DropdownItem>
                 <DropdownItem to="/admin/change-password" tag={Link}>
                   <i className="ni ni-lock-circle-open" />
-                  <span>Change Password</span>
+                  <span>Password</span>
                 </DropdownItem>
                 <DropdownItem onClick={toggleAboutUs}>
                   <i className="ni ni-paper-diploma" />
-                  <span>About Us</span>
+                  <span>About</span>
                 </DropdownItem>
                 <DropdownItem to="/admin/server" tag={Link}>
                   <i className="ni ni-sound-wave" />

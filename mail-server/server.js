@@ -4055,44 +4055,16 @@ app.post("/api/move-selected-to-review", (req, res) => {
           `🔍 Batch move - lower case path: ${originalFilePath.toLowerCase()}`
         );
 
-        // Determine target folder based on file location (same logic as single move)
-        let targetReviewFolder = "pending"; // default
-        let shouldMarkAsReplied = false;
+        // NEW LOGIC - ALL mails from Valid/Expired → processed folder
+        // Reason: When moving from Valid/Expired Mails, they are considered "Processed" for review
+        const targetReviewFolder = "processed"; // Always processed when moving from Valid/Expired
+        const shouldMarkAsReplied = true; // Always mark as replied/processed
+        
+        console.log(`🎯 BATCH MOVE - NEW LOGIC: All mails from Valid/Expired → processed folder`);
+        console.log(`🎯 BATCH MOVE - Target ReviewMail folder: ${targetReviewFolder}`);
+        console.log(`🎯 BATCH MOVE - Will be marked as: Processed (replied)`);
 
-        const lowerPath = originalFilePath.toLowerCase();
-
-        // Check for SPECIFIC REPLIED folders first
-        if (
-          lowerPath.includes("\\rep\\") ||
-          lowerPath.includes("/rep/") ||
-          lowerPath.includes("\\darep\\") ||
-          lowerPath.includes("/darep/") ||
-          lowerPath.endsWith("\\rep") ||
-          lowerPath.endsWith("/rep")
-        ) {
-          targetReviewFolder = "processed";
-          shouldMarkAsReplied = true;
-          console.log(`🎯 Batch move - from replied folder → processed`);
-        } else if (
-          lowerPath.includes("\\mustrep\\") ||
-          lowerPath.includes("/mustrep/") ||
-          lowerPath.includes("\\chuarep\\") ||
-          lowerPath.includes("/chuarep/") ||
-          lowerPath.endsWith("\\mustrep") ||
-          lowerPath.endsWith("/mustrep") ||
-          lowerPath.endsWith("\\chuarep") ||
-          lowerPath.endsWith("/chuarep")
-        ) {
-          targetReviewFolder = "pending";
-          shouldMarkAsReplied = false;
-          console.log(`🎯 Batch move - from unreplied folder → pending`);
-        } else {
-          console.log(
-            `⚠️  Batch move - unknown location, using default: pending`
-          );
-        }
-
-        console.log(`🎯 Batch move - target folder: ${targetReviewFolder}`);
+        console.log(`🎯 Batch move - target folder: ${targetReviewFolder} (always processed)`);
 
         // Create target subfolder if needed
         const reviewMailTargetPath = path.join(

@@ -135,16 +135,23 @@ const MailDetailsModal = ({
         )}
 
         {/* Reply Status */}
-        <p><strong>{getStatusBadge ? 'Reply Status' : 'Status'}:</strong>
-          {selectedMail.category === "ReviewMail" ? (
-            <Badge color={selectedMail.isReplied ? "success" : "info"} pill>
-              {selectedMail.isReplied ? "Processed" : "Under Review"}
-            </Badge>
-          ) : (
-            <Badge color={selectedMail.isReplied ? "success" : "warning"} pill>
-              {selectedMail.isReplied ? "Replied" : "Pending"}
-            </Badge>
-          )}
+        <p><strong>Reply Status:</strong>
+          {(() => {
+            const isReplied = getReplyStatusFromMail(selectedMail);
+            if (selectedMail.category === "ReviewMail") {
+              return (
+                <Badge color={isReplied ? "success" : "info"} pill>
+                  {isReplied ? "Processed" : "Pending"}
+                </Badge>
+              );
+            } else {
+              return (
+                <Badge color={isReplied ? "success" : "warning"} pill>
+                  {isReplied ? "Replied" : "Unreplied"}
+                </Badge>
+              );
+            }
+          })()}
         </p>
         <p><strong>Assigned PIC:</strong>
           {selectedMail.assignedTo ? (
@@ -162,7 +169,7 @@ const MailDetailsModal = ({
         
         {/* Time Since Sent - only show for review mails */}
         {selectedMail.category === "ReviewMail" && (
-          <p><strong>Time Since Sent:</strong> 
+          <p><strong>Time Since Sent: </strong> 
             {(() => {
               if (!selectedMail.Date || !Array.isArray(selectedMail.Date) || selectedMail.Date.length === 0) {
                 return "N/A";
@@ -236,7 +243,7 @@ const MailDetailsModal = ({
 
               if (hoursLeft <= 0) {
                 badgeColor = "danger";
-                displayText = "Expired";
+                displayText = "Overdue";
               } else if (hoursLeft <= 2) {
                 badgeColor = "danger";
                 displayText = `${hoursLeft} hours left`;

@@ -95,11 +95,11 @@ export const getReviewMailStatus = (mail) => {
 /**
  * Calculate Original Category for Review Mails based on Date sent
  * Logic:
- * - If mail was sent within last 23h59m (< 24 hours) → Valid
- * - If mail was sent 24+ hours ago → Expired
+ * - If mail was sent within last 23h59m (< 24 hours) → On-time
+ * - If mail was sent 24+ hours ago → Overdue
  *
  * @param {Object} mail - Mail object with Date field
- * @returns {Object} - { text: "Valid"|"Expired", color: "success"|"danger" }
+ * @returns {Object} - { text: "On-time"|"Overdue", color: "success"|"danger" }
  */
 export const calculateOriginalCategory = (mail) => {
   try {
@@ -127,11 +127,11 @@ export const calculateOriginalCategory = (mail) => {
     const THRESHOLD_HOURS = 24;
 
     if (hoursDifference < THRESHOLD_HOURS) {
-      // Within 23h59m → Valid
-      return { text: "Valid", color: "success" };
+      // Within 23h59m → On-time
+      return { text: "On-time", color: "success" };
     } else {
-      // Over 24 hours → Expired
-      return { text: "Expired", color: "danger" };
+      // Over 24 hours → Overdue
+      return { text: "Overdue", color: "danger" };
     }
   } catch (error) {
     console.error("Error calculating original category:", error);
@@ -150,15 +150,15 @@ export const getOriginalCategory = (mail) => {
   // If originalCategory is explicitly set from backend (auto-updated hourly)
   if (mail.originalCategory) {
     if (mail.originalCategory === "Valid") {
-      return { text: "Valid", color: "success" };
+      return { text: "On-time", color: "success" };
     } else if (mail.originalCategory === "Expired") {
-      return { text: "Expired", color: "danger" };
+      return { text: "Overdue", color: "danger" };
     }
     // Legacy support for old format
     if (mail.originalCategory === "DungHan") {
-      return { text: "Valid", color: "success" };
+      return { text: "On-time", color: "success" };
     } else if (mail.originalCategory === "QuaHan") {
-      return { text: "Expired", color: "danger" };
+      return { text: "Overdue", color: "danger" };
     }
   }
 

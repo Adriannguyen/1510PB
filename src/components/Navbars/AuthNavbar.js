@@ -16,6 +16,7 @@
 
 */
 import { Link } from "react-router-dom";
+import { useState } from "react";
 // reactstrap components
 import {
   UncontrolledCollapse,
@@ -28,11 +29,17 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import AboutUsModal from "components/AboutUsModal/AboutUsModal.js";
 
 const AdminNavbar = () => {
   // Lấy pathname để xác định đang ở trang login/auth
   const pathname = window.location.pathname;
   const isAuthPage = pathname.startsWith("/auth");
+  const [aboutUsModalOpen, setAboutUsModalOpen] = useState(false);
+
+  const toggleAboutUsModal = () => {
+    setAboutUsModalOpen(!aboutUsModalOpen);
+  };
   return (
     <>
       <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">
@@ -76,21 +83,32 @@ const AdminNavbar = () => {
                 </NavItem>
               )}
               <NavItem>
+                <NavLink className="nav-link-icon" to="/auth/login" tag={Link}>
+                  {/* <i className="ni ni-key-25" /> */}
+                  <span className="nav-link-inner--text">Login</span>
+                </NavLink>
+              </NavItem>
+              <NavItem>
                 <NavLink
                   className="nav-link-icon"
                   to="/auth/register"
                   tag={Link}
                 >
-                  <i className="ni ni-circle-08" />
+                  {/* <i className="ni ni-circle-08" /> */}
                   <span className="nav-link-inner--text">Register</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className="nav-link-icon" to="/auth/login" tag={Link}>
-                  <i className="ni ni-key-25" />
-                  <span className="nav-link-inner--text">Login</span>
+                <NavLink 
+                  className="nav-link-icon" 
+                  onClick={toggleAboutUsModal}
+                  style={{ cursor: "pointer" }}
+                >
+                  {/* <i className="ni ni-world-2" /> */}
+                  <span className="nav-link-inner--text">About</span>
                 </NavLink>
               </NavItem>
+              
               {/* Ẩn Profile khi ở trang login/auth */}
               {!isAuthPage && (
                 <NavItem>
@@ -108,6 +126,10 @@ const AdminNavbar = () => {
           </UncontrolledCollapse>
         </Container>
       </Navbar>
+      <AboutUsModal 
+        isOpen={aboutUsModalOpen} 
+        toggle={toggleAboutUsModal} 
+      />
     </>
   );
 };

@@ -208,7 +208,7 @@ const Profile = () => {
     <>
       <UserHeader />
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="mt--4" fluid>
         <Row>
           <Col className="order-xl-2 mb-5 mb-xl-0" xl="4">
             <Card className="card-profile shadow">
@@ -240,7 +240,7 @@ const Profile = () => {
                         Saving...
                       </>
                     ) : (
-                      <>{isEditing ? "Save" : "Edit Profile"}</>
+                      <>{isEditing ? "Save info" : "Edit info"}</>
                     )}
                   </Button>
                   <Button
@@ -253,7 +253,7 @@ const Profile = () => {
                     size="sm"
                     disabled={!isEditing || isSaving}
                   >
-                    Cancel
+                    Discard
                   </Button>
                 </div>
                 {saveMessage && (
@@ -286,16 +286,16 @@ const Profile = () => {
                     </span>
                   </h3>
                   <div>
-                    <i className="ni ni-email-83 mr-2" />
-                    {user.email}
-                  </div>
-                  <div>
                     <i className="ni ni-single-02 mr-2" />
                     Username: {user.username}
                   </div>
                   <div>
-                    <i className="ni ni-calendar-grid-58 mr-2" />
-                    Joined:{" "}
+                    <i className="ni ni-email-83 mr-2" />
+                    {user.email}
+                  </div>
+                  <div>
+                    <i className="ni ni-square-pin mr-2" />
+                    Last accessed:{" "}
                     {new Date(
                       user.createdAt || Date.now()
                     ).toLocaleDateString()}
@@ -324,7 +324,7 @@ const Profile = () => {
                   <Col xs="8">
                     <h3 className="mb-0">My Account</h3>
                     <p className="text-muted mb-0">
-                      Manage your profile information
+                      Manage your user profile information
                     </p>
                   </Col>
                   <Col className="text-right" xs="4">
@@ -397,13 +397,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-first-name"
                           >
-                            First name
+                            Last name
                           </label>
                           <Input
                             className="form-control-alternative"
                             value={formData.firstName}
                             id="input-first-name"
-                            placeholder="First name"
+                            placeholder="Last name"
                             type="text"
                             name="firstName"
                             onChange={handleInputChange}
@@ -417,13 +417,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-last-name"
                           >
-                            Last name
+                            First name
                           </label>
                           <Input
                             className="form-control-alternative"
                             value={formData.lastName}
                             id="input-last-name"
-                            placeholder="Last name"
+                            placeholder="First name"
                             type="text"
                             name="lastName"
                             onChange={handleInputChange}
@@ -446,13 +446,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-address"
                           >
-                            Address
+                            Title job
                           </label>
                           <Input
                             className="form-control-alternative"
                             value={formData.address}
                             id="input-address"
-                            placeholder="Home Address"
+                            placeholder="Engineer, Software Quality Engineer"
                             type="text"
                             name="address"
                             onChange={handleInputChange}
@@ -468,13 +468,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-city"
                           >
-                            City
+                            Part
                           </label>
                           <Input
                             className="form-control-alternative"
                             value={formData.city}
                             id="input-city"
-                            placeholder="City"
+                            placeholder="P"
                             type="text"
                             name="city"
                             onChange={handleInputChange}
@@ -488,13 +488,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-country"
                           >
-                            Country
+                            Group
                           </label>
                           <Input
                             className="form-control-alternative"
                             value={formData.country}
                             id="input-country"
-                            placeholder="Country"
+                            placeholder="G"
                             type="text"
                             name="country"
                             onChange={handleInputChange}
@@ -508,13 +508,13 @@ const Profile = () => {
                             className="form-control-label"
                             htmlFor="input-country"
                           >
-                            Postal code
+                            Office
                           </label>
                           <Input
                             className="form-control-alternative"
                             value={formData.postalCode}
                             id="input-postal-code"
-                            placeholder="Postal code"
+                            placeholder="MX"
                             type="text"
                             name="postalCode"
                             onChange={handleInputChange}
@@ -546,7 +546,8 @@ const Profile = () => {
               </CardBody>
             </Card>
 
-            {/* Password Change Card */}
+            {/* Password Change Card - Hidden */}
+            {false && (
             <Card className="bg-secondary shadow mt-4">
               <CardHeader className="bg-white border-0">
                 <Row className="align-items-center">
@@ -726,6 +727,7 @@ const Profile = () => {
                 </Form>
               </CardBody>
             </Card>
+            )}
           </Col>
         </Row>
       </Container>

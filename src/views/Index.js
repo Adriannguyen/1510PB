@@ -135,7 +135,7 @@ const Index = (props) => {
     <>
       <MailHeader />
       {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="mt-3" fluid>
         {/* Mail Data Info */}
         <Row>
           <Col xl="8">
@@ -152,7 +152,7 @@ const Index = (props) => {
           </Col> */}
         </Row>
 
-        <Row style={{marginTop:"100px"}}>
+        <Row style={{marginTop:"5px"}}>
           <Col className="mb-5 mb-xl-0" xl="8">
             <MailStatisticsChart />
           </Col>
@@ -162,7 +162,7 @@ const Index = (props) => {
                 <Row className="align-items-center">
                   <div className="col">
                     <h2 className="text-uppercase text-muted ls-1 mb-1">
-                      <b>PIC Ranking</b>
+                      <span style={{ fontWeight: '550' }}>PIC Ranking</span>
                     </h2>
                     <h3 className="text-muted mb-0">
                       Top Delayed Responders

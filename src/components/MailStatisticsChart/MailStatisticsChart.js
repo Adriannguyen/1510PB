@@ -157,22 +157,22 @@ const MailStatisticsChart = () => {
   // All 6 chart data items in one chart (Review split into 2 columns)
   const chartData = [
     {
-      label: "Reply (Valid)",
+      label: "Replied (On-time)",
       value: filteredStats.validReplied || 0,
       color: "#2dce89", // Green
     },
     {
-      label: "Non-reply (Valid)",
+      label: "Unreplied (On-time)",
       value: filteredStats.validUnreplied || 0,
       color: "#2dce89", // Green
     },
     {
-      label: "Reply (Expired)",
+      label: "Replied (Overdue)",
       value: filteredStats.expiredReplied || 0,
       color: "#fb6340", // Red
     },
     {
-      label: "Non-reply (Expired)",
+      label: "Unreplied (Overdue)",
       value: filteredStats.expiredUnreplied || 0,
       color: "#fb6340", // Red
     },
@@ -182,7 +182,7 @@ const MailStatisticsChart = () => {
       color: "#8965e0", // Purple
     },
     {
-      label: "Under Review (Review)",
+      label: "Pending (Review)",
       value: filteredStats.reviewPending || 0,
       color: "#8965e0", // Purple
     },
@@ -363,7 +363,7 @@ const MailStatisticsChart = () => {
             <Row>
               <Col xs="3">
                 <div className="text-center">
-                  <span className="text-light text-sm">Total Valid</span>
+                  <span className="text-light text-sm">Total On-time</span>
                   <div className="h4 text-white font-weight-bold">
                     {filteredStats.valid}
                   </div>
@@ -371,7 +371,7 @@ const MailStatisticsChart = () => {
               </Col>
               <Col xs="3">
                 <div className="text-center">
-                  <span className="text-light text-sm">Total Expired</span>
+                  <span className="text-light text-sm">Total Overdue</span>
                   <div className="h4 text-white font-weight-bold">
                     {filteredStats.expired}
                   </div>

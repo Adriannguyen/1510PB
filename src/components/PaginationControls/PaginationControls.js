@@ -44,12 +44,12 @@ const PaginationControls = ({
                   <option key={option} value={option}>{option}</option>
                 ))}
               </Input>
-              <span className="ml-2 text-muted">mục/trang</span>
+              <span className="ml-2 text-muted">mails/page</span>
             </FormGroup>
           </Col>
           <Col className="col-auto">
             <small className="text-muted">
-              Hiển thị {startIndex + 1}-{Math.min(endIndex, totalItems)} của {totalItems} mục
+              Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} mails
             </small>
           </Col>
         </Row>

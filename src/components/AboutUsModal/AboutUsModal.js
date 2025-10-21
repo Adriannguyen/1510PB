@@ -44,7 +44,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
                   marginBottom: "12px",
                 }}
               />
-              <h4 className="mb-0 font-weight-bold text-primary">MAIL SYSTEM</h4>
+              <h4 className="mb-0 font-weight-bold text-primary">PROMPT BOX</h4>
             </div>
           </div>
 
@@ -61,27 +61,27 @@ const AboutUsModal = ({ isOpen, toggle }) => {
               PROMPT BOX
             </h5>
             <p className="mb-3 text-muted font-weight-600" style={{ fontSize: "0.875rem" }}>
-              Nguyễn Phú Đức
+              AI-driven Mail System
             </p>
 
             <div className="mb-0">
               <p className="mb-1" style={{ fontSize: "0.8125rem" }}>
-                <strong>Version:</strong> 2025.05.19.1.00.Release
+                <strong>Version:</strong> 2025.0519.1020.00.Release
               </p>
               <p className="mb-1" style={{ fontSize: "0.8125rem" }}>
                 <strong>Contact:</strong>{" "}
                 <a
-                  href="mailto:phu.duc.ng@example.com"
+                  //href="mailto:phu.duc.ng@example.com"
                   className="text-primary"
                   style={{ textDecoration: "none" }}
                 >
-                  phu.duc.ng
+                  phu.duc.ng, cong.ngx
                 </a>
               </p>
               <p className="mb-1" style={{ fontSize: "0.8125rem" }}>
                 <a
                   href="#opensource"
-                  className="text-primary"
+                  className="text-default"
                   style={{ textDecoration: "none" }}
                   onClick={(e) => e.preventDefault()}
                 >
@@ -91,7 +91,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
               <p className="mb-0" style={{ fontSize: "0.8125rem" }}>
                 <a
                   href="#terms"
-                  className="text-primary"
+                  className="text-default"
                   style={{ textDecoration: "none" }}
                   onClick={(e) => e.preventDefault()}
                 >

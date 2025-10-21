@@ -136,11 +136,11 @@ const RealtimeMailMonitor = () => {
                   <td><Badge color={mailStats.newMails > 0 ? 'warning' : 'success'}>{mailStats.newMails}</Badge></td>
                 </tr>
                 <tr>
-                  <td><strong>Valid (Unreplied):</strong></td>
+                  <td><strong>On-time (Unreplied):</strong></td>
                   <td><Badge color="primary">{mailStats.dungHanUnreplied}</Badge></td>
                 </tr>
                 <tr>
-                  <td><strong>Expired (Unreplied):</strong></td>
+                  <td><strong>Overdue (Unreplied):</strong></td>
                   <td><Badge color="danger">{mailStats.quaHanUnreplied}</Badge></td>
                 </tr>
                 <tr>

@@ -46,21 +46,21 @@ var routes = [
   },
   {
     path: "/all-mails",
-    name: "All Mails",
+    name: "Total Mails",
     icon: "ni ni-email-83 text-info",
     component: <AllMails />,
     layout: "/admin",
   },
   {
     path: "/valid-mails",
-    name: "Valid Mails",
+    name: "On-time Mails",
     icon: "ni ni-check-bold text-success",
     component: <ValidMails />,
     layout: "/admin",
   },
   {
     path: "/expired-mails",
-    name: "Expired Mails",
+    name: "Overdue Mails",
     icon: "ni ni-fat-remove text-danger",
     component: <ExpiredMails />,
     layout: "/admin",
@@ -110,6 +110,7 @@ var routes = [
     icon: "ni ni-lock-circle-open text-primary",
     component: <ChangePassword />,
     layout: "/admin",
+    invisible: true,
   },
   {
     path: "/about-us",

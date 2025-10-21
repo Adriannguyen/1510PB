@@ -56,6 +56,7 @@ import MailDetailsModal from "components/MailDetailsModal/MailDetailsModal.js";
 import MailTable from "components/MailTable/MailTable.js";
 import AddSenderToGroupModal from "components/AddSenderToGroupModal/AddSenderToGroupModal.js";
 import { useMailContext } from "contexts/MailContext.js";
+import "assets/css/mail-table-scroll.css";
 import { useGroupContext } from "contexts/GroupContext.js";
 import AssignModal from "components/AssignModal.js";
 import CompactClock from "components/RealtimeClock/CompactClock.js";
@@ -368,7 +369,7 @@ const ReviewMails = () => {
       // Review status filter
       let matchesReviewStatus = true;
       if (reviewStatusFilter === "under_review") {
-        // Mails that are under review (in pending folder)
+        // Mails that are pending (in pending folder)
         matchesReviewStatus = getReviewMailStatus(mail) === "pending";
       } else if (reviewStatusFilter === "processed") {
         // Mails that are processed (in processed folder)
@@ -448,6 +449,42 @@ const ReviewMails = () => {
   const handleStatusClick = (mail) => {
     setMailToChangeStatus(mail);
     setStatusModalOpen(true);
+  };
+
+  // Helper function to get filtered count for buttons
+  const getFilteredCount = (reviewStatusFilter = null) => {
+    return reviewMails.filter((mail) => {
+      // Search filter
+      const matchesSearch =
+        (mail.Subject || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (mail.From || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (mail.assignedTo?.picName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (mail.assignedTo?.groupName || "").toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Date filter
+      const matchesDate =
+        dateFilterStart || dateFilterEnd
+          ? filterMailsByDateRange([mail], dateFilterStart, dateFilterEnd)
+              .length > 0
+          : true;
+
+      // Reply status filter
+      let matchesReplyStatus = true;
+      if (replyStatusFilter === "replied")
+        matchesReplyStatus = isMailReplied(mail);
+      if (replyStatusFilter === "not_replied")
+        matchesReplyStatus = !isMailReplied(mail);
+
+      // Review status filter for counting
+      let matchesReviewStatus = true;
+      if (reviewStatusFilter === "under_review") {
+        matchesReviewStatus = getReviewMailStatus(mail) === "pending";
+      } else if (reviewStatusFilter === "processed") {
+        matchesReviewStatus = getReviewMailStatus(mail) === "processed";
+      }
+
+      return matchesSearch && matchesDate && matchesReplyStatus && matchesReviewStatus;
+    }).length;
   };
 
   const handleStatusChange = async (newStatus) => {
@@ -534,16 +571,16 @@ const ReviewMails = () => {
       {/* Page content */}
       <Container className="mt--5 mail-page mail-system compact-layout" fluid>
         {/* Date Filter */}
-        <Row className="mb-4">
+        <Row className="mb-2" style={{ marginTop: '-2.5rem' }}>
           <Col>
-            <Card className="shadow">
-              <CardBody>
-                <div className="d-flex justify-content-between align-items-center p-3">
-                  <div className="flex-grow-1">
-                    <DateFilterNew onDateChange={handleDateChange} />
-                  </div>
-                  <div className="ml-4">
+            <Card className="shadow" style={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+              <CardBody style={{ backgroundColor: 'transparent', padding: '0.75rem 0' }}>
+                <div className="d-flex justify-content-end align-items-center">
+                  <div className="mr-4">
                     <CompactClock />
+                  </div>
+                  <div>
+                    <DateFilterNew onDateChange={handleDateChange} />
                   </div>
                 </div>
               </CardBody>
@@ -585,7 +622,7 @@ const ReviewMails = () => {
                       Move Return ({selectedMails.length})
                     </Button>
                   </div>
-                  <div className="col-lg-6 col-5">
+                  <div className="col-lg-4 col-5">
                     <InputGroup>
                       <Input
                         placeholder="Search by subject, sender, or assigned PIC..."
@@ -615,7 +652,7 @@ const ReviewMails = () => {
                         size="sm"
                         className="mr-1"
                       >
-                        All ({reviewMails.length})
+                        All ({getFilteredCount()})
                       </Button>
                       <Button
                         color={
@@ -627,13 +664,7 @@ const ReviewMails = () => {
                         size="sm"
                         className="mr-1"
                       >
-                        Under Review (
-                        {
-                          reviewMails.filter((mail) => {
-                            return getReviewMailStatus(mail) === "pending"; // folder-based check
-                          }).length
-                        }
-                        )
+                        Pending ({getFilteredCount("under_review")})
                       </Button>
                       <Button
                         color={
@@ -644,19 +675,13 @@ const ReviewMails = () => {
                         onClick={() => handleReviewStatusChange("processed")}
                         size="sm"
                       >
-                        Processed (
-                        {
-                          reviewMails.filter((mail) => {
-                            return getReviewMailStatus(mail) === "processed"; // folder-based check
-                          }).length
-                        }
-                        )
+                        Processed ({getFilteredCount("processed")})
                       </Button>
                     </div>
                   </div>
-                  <div className="col-auto">
-                    <FormGroup className="mb-0">
-                      <Label for="itemsPerPage" className="form-control-label">
+                  <div className="col-auto d-flex align-items-center">
+                    <FormGroup className="mb-0 d-flex align-items-center">
+                      <Label for="itemsPerPage" className="form-control-label mb-0">
                         Show:
                       </Label>
                       <Input
@@ -679,15 +704,15 @@ const ReviewMails = () => {
                         <option value={50}>50</option>
                         <option value={100}>100</option>
                       </Input>
-                      <span className="ml-2 text-muted">items/page</span>
+                      <span className="ml-2 text-muted" style={{ fontSize: '0.875rem' }}>mails/page</span>
                     </FormGroup>
                   </div>
-                  <div className="col-auto">
-                    <small className="text-muted">
+                  <div className="col-auto d-flex align-items-center">
+                    <span className="text-muted" style={{ fontSize: '0.875rem' }}>
                       Showing {startIndex + 1}-
                       {Math.min(endIndex, filteredMails.length)} of{" "}
-                      {filteredMails.length} items
-                    </small>
+                      {filteredMails.length} mails
+                    </span>
                   </div>
                 </Row>
               </CardHeader>
@@ -773,7 +798,7 @@ const ReviewMails = () => {
                 >
                   {getReviewMailStatus(mailToChangeStatus) === "processed"
                     ? "Processed"
-                    : "Under Review"}
+                    : "Pending"}
                 </Badge>
               </p>
               <p>
@@ -791,8 +816,8 @@ const ReviewMails = () => {
                   }
                   className="mr-2"
                 >
-                  <i className="fas fa-clock mr-1" />
-                  Under Review
+                  {/* <i className="fas fa-clock mr-1" /> */}
+                  Pending
                 </Button>
                 <Button
                   color="success"
@@ -801,7 +826,7 @@ const ReviewMails = () => {
                     getReviewMailStatus(mailToChangeStatus) === "processed"
                   }
                 >
-                  <i className="fas fa-check mr-1" />
+                  {/* <i className="fas fa-check mr-1" /> */}
                   Processed
                 </Button>
               </div>

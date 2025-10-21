@@ -25,9 +25,9 @@ const UserHeader = () => {
   return (
     <>
       <div
-        className="header bg-gradient-info pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+        className="header bg-gradient-info pb-4 pt-1 pt-lg-2 d-flex align-items-center"
         style={{
-          minHeight: "600px",
+          minHeight: "300px",
           backgroundImage: "url(" + require("../../assets/img/theme/profile-cover.jpg") + ")",
           backgroundSize: "cover",
           backgroundPosition: "center top",
@@ -43,7 +43,7 @@ const UserHeader = () => {
           <Row>
             <Col lg="7" md="10">
               <h1 className="display-2 text-white">
-                Hello {user?.fullName || user?.username || 'User'}
+                G'day, {user?.fullName || user?.username || 'User'}
               </h1>
               <p className="text-white mt-0 mb-5">
                 This is your profile page. You can see your account information,

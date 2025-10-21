@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext.js";
+import { InputGroup, InputGroupAddon, InputGroupText } from "reactstrap";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,10 @@ const Register = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -24,6 +29,13 @@ const Register = () => {
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
     }));
   };
 
@@ -146,7 +158,7 @@ const Register = () => {
                 <div className="input-group input-group-alternative">
                   <div className="input-group-prepend">
                     <span className="input-group-text">
-                      <i className="ni ni-hat-3"></i>
+                      <i className="ni ni-badge"></i>
                     </span>
                   </div>
                   <input
@@ -221,41 +233,65 @@ const Register = () => {
                   </div> */}
 
               <div className="form-group mb-3">
-                <div className="input-group input-group-alternative">
-                  <div className="input-group-prepend">
-                    <span className="input-group-text">
+                <InputGroup className="input-group-alternative">
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
                       <i className="ni ni-lock-circle-open"></i>
-                    </span>
-                  </div>
+                    </InputGroupText>
+                  </InputGroupAddon>
                   <input
                     className="form-control"
                     placeholder="Password"
-                    type="password"
+                    type={showPasswords.password ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
                     required
                   />
-                </div>
+                  <InputGroupAddon addonType="append">
+                    <InputGroupText
+                      style={{ cursor: "pointer" }}
+                      onClick={() => togglePasswordVisibility("password")}
+                    >
+                      <i
+                        className={`fas ${
+                          showPasswords.password ? "fa-eye-slash" : "fa-eye"
+                        }`}
+                      />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
               </div>
 
               <div className="form-group mb-3">
-                <div className="input-group input-group-alternative">
-                  <div className="input-group-prepend">
-                    <span className="input-group-text">
+                <InputGroup className="input-group-alternative">
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
                       <i className="ni ni-lock-circle-open"></i>
-                    </span>
-                  </div>
+                    </InputGroupText>
+                  </InputGroupAddon>
                   <input
                     className="form-control"
                     placeholder="Confirm Password"
-                    type="password"
+                    type={showPasswords.confirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     required
                   />
-                </div>
+                  <InputGroupAddon addonType="append">
+                    <InputGroupText
+                      style={{ cursor: "pointer" }}
+                      onClick={() => togglePasswordVisibility("confirmPassword")}
+                    >
+                      <i
+                        className={`fas ${
+                          showPasswords.confirmPassword ? "fa-eye-slash" : "fa-eye"
+                        }`}
+                      />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
               </div>
 
               <div className="custom-control custom-control-alternative custom-checkbox">
@@ -290,7 +326,7 @@ const Register = () => {
                     </>
                   ) : (
                     <>
-                      <i className="ni ni-check-bold mr-2"></i>
+                      {/* <i className="ni ni-check-bold mr-2"></i> */}
                       Create Account
                     </>
                   )}

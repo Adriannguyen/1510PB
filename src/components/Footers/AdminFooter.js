@@ -32,7 +32,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Phu.duc.ng Note
+              Prompt Box
             </a>
           </div>
         </Col>
@@ -44,10 +44,27 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Phu.duc.ng Note
+                AI-driven Mail System
               </NavLink>
             </NavItem>
-
+            <NavItem>
+              <NavLink
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Service & Visual Verification P
+              </NavLink>
+            </NavItem>
+            {/*
+            <NavItem>
+              <NavLink
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                SRV Operation Team
+              </NavLink>
+            </NavItem>
+            */}
             <NavItem>
               <NavLink
                 rel="noopener noreferrer"

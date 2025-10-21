@@ -1,0 +1,140 @@
+/* Mail Table Scroll Container Styles */
+.mail-table-container {
+  max-height: 70vh; /* Chiều cao tối đa của container */
+  overflow-y: auto; /* Cho phép cuộn dọc */
+  overflow-x: auto; /* Chỉ hiển thị thanh cuộn ngang khi cần */
+  position: relative;
+}
+
+/* Sticky header cho bảng khi cuộn */
+.mail-table-container .thead-light {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #f8f9fe;
+}
+
+/* Đảm bảo header không bị mờ khi cuộn */
+.mail-table-container .thead-light th {
+  background-color: #f8f9fe !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 101;
+}
+
+/* Hide the duplicate header in scrollable container */
+.mail-table-container .thead-light.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Ensure checkbox column in fixed header is properly styled */
+.mail-table-fixed-header .sticky-checkbox {
+  position: sticky;
+  left: 0;
+  z-index: 103;
+  background-color: #f8f9fe;
+  min-width: 60px;
+  max-width: 60px;
+  width: 60px;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+/* Style cho scrollbar */
+.mail-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.mail-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.mail-table-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.mail-table-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mail-table-container {
+    max-height: 60vh; /* Giảm chiều cao trên mobile */
+  }
+}
+
+@media (max-width: 576px) {
+  .mail-table-container {
+    max-height: 50vh; /* Giảm thêm chiều cao trên mobile nhỏ */
+  }
+}
+
+/* Đảm bảo checkbox column vẫn sticky khi cuộn */
+.mail-table-container .table .sticky-checkbox {
+  position: sticky;
+  left: 0;
+  z-index: 102; /* Cao hơn header để luôn visible */
+  background-color: white;
+  min-width: 60px;
+  max-width: 60px;
+  width: 60px;
+}
+
+/* Đảm bảo checkbox header và cells có background trắng khi cuộn */
+.mail-table-container .table th.sticky-checkbox,
+.mail-table-container .table td.sticky-checkbox {
+  background-color: white !important;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+/* Đảm bảo checkbox header có z-index cao nhất */
+.mail-table-container .table th.sticky-checkbox {
+  z-index: 103; /* Cao nhất để luôn ở trên cùng */
+}
+
+/* Animation cho smooth scroll */
+.mail-table-container {
+  scroll-behavior: smooth;
+}
+
+/* Fix cho table trong container */
+.mail-table-container .table-responsive {
+  margin-bottom: 0;
+}
+
+/* Đảm bảo các dòng trong bảng không bị break khi cuộn */
+.mail-table-container .table td,
+.mail-table-container .table th {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Cho phép text wrap trong subject column nếu cần */
+.mail-table-container .table td:nth-child(2) {
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Style cho dropdown menu trong table khi cuộn */
+.mail-table-container .dropdown-menu {
+  z-index: 1050;
+}
+
+/* Fix cho badge animation trong table khi cuộn */
+.mail-table-container .badge {
+  position: relative;
+  z-index: 1;
+}

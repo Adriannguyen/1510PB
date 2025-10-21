@@ -33,7 +33,7 @@ import { useAuth } from "contexts/AuthContext.js";
 import { API_BASE_URL } from "constants/api.js";
 
 const ChangePassword = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -121,11 +121,11 @@ const ChangePassword = () => {
       return false;
     }
 
-    // Check password length
-    if (passwordData.newPassword.length < 8) {
+    // Check password length (same as Profile.js - minimum 6 characters)
+    if (passwordData.newPassword.length < 6) {
       setMessage({
         type: "danger",
-        text: "New password must be at least 8 characters long",
+        text: "New password must be at least 6 characters long",
       });
       return false;
     }
@@ -152,6 +152,56 @@ const ChangePassword = () => {
   };
 
   const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setMessage({ type: "", text: "" });
+
+    if (!validatePasswordChange()) {
+      return;
+    }
+
+    setIsChanging(true);
+
+    try {
+      // Use updateUser from AuthContext (same as Profile.js)
+      const result = await updateUser({
+        username: user.username,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      if (result.success) {
+        setMessage({
+          type: "success",
+          text: "Password changed successfully! You can now login with your new password.",
+        });
+        // Clear form
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setPasswordStrength({ score: 0, text: "", color: "" });
+      } else {
+        setMessage({
+          type: "danger",
+          text: result.error || "Failed to change password",
+        });
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      setMessage({
+        type: "danger",
+        text: "An error occurred while changing password. Please try again.",
+      });
+    } finally {
+      setIsChanging(false);
+    }
+  };
+
+  // Old implementation (hidden) - Direct API call approach
+  // This code is commented out to preserve the original implementation
+  /*
+  const handlePasswordChangeOld = async (e) => {
     e.preventDefault();
     setMessage({ type: "", text: "" });
 
@@ -203,6 +253,7 @@ const ChangePassword = () => {
       setIsChanging(false);
     }
   };
+  */
 
   const handleCancel = () => {
     setPasswordData({
@@ -226,7 +277,7 @@ const ChangePassword = () => {
                 <Row className="align-items-center">
                   <Col xs="8">
                     <h3 className="mb-0">
-                      <i className="ni ni-lock-circle-open text-primary mr-2"></i>
+                      {/* <i className="ni ni-lock-circle-open text-primary mr-2"></i> */}
                       Change Password
                     </h3>
                   </Col>
@@ -287,7 +338,7 @@ const ChangePassword = () => {
                           className="form-control-alternative"
                           id="newPassword"
                           name="newPassword"
-                          placeholder="Enter new password (min. 8 characters)"
+                          placeholder="Enter new password (min. 6 characters)"
                           type={showPasswords.new ? "text" : "password"}
                           value={passwordData.newPassword}
                           onChange={handleInputChange}
@@ -312,7 +363,7 @@ const ChangePassword = () => {
                         </small>
                       )}
                       <small className="text-muted mt-1 d-block">
-                        Use 8+ characters with a mix of letters, numbers & symbols
+                        Use 6+ characters with a mix of letters, numbers & symbols
                       </small>
                     </FormGroup>
 
@@ -369,7 +420,7 @@ const ChangePassword = () => {
                         onClick={handleCancel}
                         disabled={isChanging}
                       >
-                        <i className="ni ni-fat-remove mr-1"></i>
+                        {/* <i className="ni ni-fat-remove mr-1"></i> */}
                         Cancel
                       </Button>
                       <Button
@@ -389,7 +440,7 @@ const ChangePassword = () => {
                           </>
                         ) : (
                           <>
-                            <i className="ni ni-lock-circle-open mr-1"></i>
+                            {/* <i className="ni ni-lock-circle-open mr-1"></i> */}
                             Change Password
                           </>
                         )}
@@ -415,7 +466,7 @@ const ChangePassword = () => {
                 <ul className="list-unstyled">
                   <li className="py-2">
                     <i className="ni ni-check-bold text-success mr-2"></i>
-                    Use at least 8 characters
+                    Use at least 6 characters
                   </li>
                   <li className="py-2">
                     <i className="ni ni-check-bold text-success mr-2"></i>
