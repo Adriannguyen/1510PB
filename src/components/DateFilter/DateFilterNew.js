@@ -184,16 +184,16 @@ const DateFilterNew = ({ onDateChange }) => {
           caret
           className={`btn d-flex align-items-center ${
             selectedFilter === "None"
-              ? "btn-outline-secondary"
-              : "btn-outline-primary"
+              ? "btn-outline-secondary text-dark"
+              : "btn-outline-primary text-dark"
           }`}
           style={{ minWidth: "200px" }}
         >
           <i
             className={`${
               selectedFilter === "None"
-                ? "ni ni-time-alarm"
-                : "ni ni-time-alarm"
+                ? "ni ni-calendar-grid-58"
+                : "ni ni-calendar-grid-58"
             } mr-2`}
           />
           {selectedFilter === "None" ? "No Date Filter" : selectedFilter}
@@ -216,7 +216,7 @@ const DateFilterNew = ({ onDateChange }) => {
               style={{ width: "250px", padding: "15px" }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h6 className="text-primary mb-3">Custom date range</h6>
+              <h6 className="text-info mb-3" style={{ fontSize: '1rem' }}><b>Custom Date Range</b></h6>
 
               <FormGroup>
                 <Label className="form-control-label text-sm">From</Label>
@@ -245,7 +245,7 @@ const DateFilterNew = ({ onDateChange }) => {
               </FormGroup>
 
               <Button
-                color="primary"
+                color="info"
                 size="sm"
                 block
                 onClick={handleApplyCustomRange}
@@ -299,10 +299,10 @@ const DateFilterNew = ({ onDateChange }) => {
                   <div
                     key={index}
                     className={`p-2 cursor-pointer rounded mb-1 ${
-                      selectedFilter === range.label
-                        ? range.value === null
-                          ? "bg-primary text-whit"
-                          : "bg-primary text-white"
+                      selectedFilter === range.label && range.value === null
+                        ? "bg-info text-black"
+                        : selectedFilter === range.label
+                        ? "bg-info text-black"
                         : "hover-bg-light"
                     } ${range.value === null ? "border border-secondary" : ""}`}
                     onClick={() => handleQuickRangeSelect(range)}
@@ -314,10 +314,7 @@ const DateFilterNew = ({ onDateChange }) => {
                     }}
                   >
                     {range.value === null ? (
-                      <>
-                        <i className="fas fa-times-circle mr-2"></i>
-                        {range.label}
-                      </>
+                      range.label
                     ) : (
                       range.label
                     )}
@@ -326,10 +323,10 @@ const DateFilterNew = ({ onDateChange }) => {
               </div>
 
               <div className="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
-                <small className="text-primary font-weight-bold">
+                <small className="text-info font-weight-bold">
                   Date Filter
                 </small>
-                <small className="text-muted">dd/mm/yyyy format</small>
+                <small className="text-muted">dd/mm/yyyy</small>
               </div>
             </div>
           </div>

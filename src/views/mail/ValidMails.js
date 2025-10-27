@@ -64,6 +64,7 @@ import SenderFilter from "components/SenderFilter/SenderFilter.js";
 import PICFilter from "components/PICFilter/PICFilter.js";
 import { API_BASE_URL } from "constants/api";
 import { isMailReplied } from "utils/replyStatusUtils";
+import "assets/css/mail-table-scroll.css";
 
 const ValidMails = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -290,7 +291,7 @@ const ValidMails = () => {
         // Show success alert
         setExpiredMovedAlert({
           type: "success",
-          message: `Successfully moved ${selectedMails.length} mail(s) to Expired section`,
+          message: `Successfully moved ${selectedMails.length} mail(s) to Overdue section`,
           timestamp: new Date(),
         });
 
@@ -515,7 +516,7 @@ const ValidMails = () => {
       if (data.type === "expired_moved" && data.count > 0) {
         setExpiredMovedAlert({
           type: "info",
-          message: `${data.count} mail(s) đã quá hạn và được chuyển sang phần "Expired Mails"`,
+          message: `${data.count} mail(s) đã quá hạn và được chuyển sang phần "Overdue Mails"`,
           timestamp: new Date(),
         });
 
@@ -816,16 +817,16 @@ const ValidMails = () => {
         )}
 
         {/* Date Filter */}
-        <Row className="mb-4">
+        <Row className="mb-2" style={{ marginTop: '-2.5rem' }}>
           <Col>
-            <Card className="shadow">
-              <CardBody>
-                <div className="d-flex justify-content-between align-items-center p-3">
-                  <div className="flex-grow-1">
-                    <DateFilterNew onDateChange={handleDateChange} />
-                  </div>
-                  <div className="ml-4">
+            <Card className="shadow" style={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+              <CardBody style={{ backgroundColor: 'transparent', padding: '0.75rem 0' }}>
+                <div className="d-flex justify-content-end align-items-center">
+                  <div className="mr-4">
                     <CompactClock />
+                  </div>
+                  <div>
+                    <DateFilterNew onDateChange={handleDateChange} />
                   </div>
                 </div>
               </CardBody>
@@ -842,11 +843,11 @@ const ValidMails = () => {
                   <div className="col">
                     <h3 className="mb-0">
                       <i className="ni ni-check-bold text-success mr-2" />
-                      Valid Mails ({filteredMails.length})
+                      On-time Mails ({filteredMails.length})
                     </h3>
                   </div>
                   <div className="col-auto">
-                    {/* Column Filters */}
+                    {/* Column Filters 
                     <div className="d-inline-block mr-2">
                       <SenderFilter
                         mails={validMails}
@@ -864,6 +865,7 @@ const ValidMails = () => {
                         onClear={handlePICFilterClear}
                       />
                     </div>
+                    */}
                     <Button
                       color="info"
                       size="sm"
@@ -876,7 +878,7 @@ const ValidMails = () => {
                       Move to Review ({selectedMails.length})
                     </Button>
                   </div>
-                  <div className="col-lg-6 col-5">
+                  <div className="col-lg-4 col-5">
                     <InputGroup>
                       <Input
                         placeholder="Search by subject, sender, or assigned PIC..."
@@ -916,7 +918,7 @@ const ValidMails = () => {
                         onClick={() => setReplyStatusFilter("not_replied")}
                         size="sm"
                       >
-                        Non-Reply ({getFilteredCount("not_replied")})
+                        Unreplied ({getFilteredCount("not_replied")})
                       </Button>
                       <Button
                         color={
@@ -931,9 +933,9 @@ const ValidMails = () => {
                       </Button>
                     </ButtonGroup>
                   </div>
-                  <div className="col-auto">
-                    <FormGroup className="mb-0">
-                      <Label for="itemsPerPage" className="form-control-label">
+                  <div className="col-auto d-flex align-items-center">
+                    <FormGroup className="mb-0 d-flex align-items-center">
+                      <Label for="itemsPerPage" className="form-control-label mb-0">
                         Show:
                       </Label>
                       <Input
@@ -956,15 +958,15 @@ const ValidMails = () => {
                         <option value={50}>50</option>
                         <option value={100}>100</option>
                       </Input>
-                      <span className="ml-2 text-muted">items/page</span>
+                      <span className="ml-2 text-muted" style={{ fontSize: '0.875rem' }}>mails/page</span>
                     </FormGroup>
                   </div>
-                  <div className="col-auto">
-                    <small className="text-muted">
+                  <div className="col-auto d-flex align-items-center">
+                    <span className="text-muted" style={{ fontSize: '0.875rem' }}>
                       Showing {startIndex + 1}-
                       {Math.min(endIndex, filteredMails.length)} of{" "}
-                      {filteredMails.length} items
-                    </small>
+                      {filteredMails.length} mails
+                    </span>
                   </div>
                 </Row>
               </CardHeader>

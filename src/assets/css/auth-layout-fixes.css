@@ -23,14 +23,14 @@ body.bg-default {
 
 /* Header optimization */
 .header.bg-gradient-info {
-  padding-top: 3rem !important;
-  padding-bottom: 3rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 2rem !important;
 }
 
 @media (min-width: 992px) {
   .header.bg-gradient-info {
-    padding-top: 4rem !important;
-    padding-bottom: 4rem !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 2.5rem !important;
   }
 }
 

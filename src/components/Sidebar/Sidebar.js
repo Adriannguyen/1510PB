@@ -370,7 +370,7 @@ const Sidebar = (props) => {
             <RealtimeClock />
           </div> */}
 
-          {/* Logout Button - Positioned at absolute bottom */}
+          {/* Logout Button - Positioned at absolute bottom 
           <div className="px-3 mt-auto">
             <Button
               color="secondary"
@@ -383,6 +383,7 @@ const Sidebar = (props) => {
               <span>Logout</span>
             </Button>
           </div>
+          */}
         </Collapse>
       </Container>
     </Navbar>

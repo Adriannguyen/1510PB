@@ -315,7 +315,7 @@ const AddSenderToGroupModal = ({ isOpen, toggle, senderEmail, onSuccess }) => {
               </>
             ) : (
               <>
-                <i className="ni ni-check-bold mr-2"></i>
+                {/* <i className="ni ni-check-bold mr-2"></i> */}
                 Add to {selectedGroups.length} Group(s)
               </>
             )}

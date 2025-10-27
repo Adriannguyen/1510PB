@@ -78,7 +78,7 @@ const MailTable = ({
 
       if (hoursLeft <= 0) {
         badgeColor = "danger";
-        displayText = "Expired";
+        displayText = "Overdue";
       } else if (hoursLeft <= 2) {
         badgeColor = "danger";
         displayText = `${hoursLeft}h left`;
@@ -119,13 +119,13 @@ const MailTable = ({
           style={{ cursor: onStatusClick ? "pointer" : "default" }}
           onClick={() => onStatusClick && onStatusClick(mail)}
         >
-          {isReplied ? "Processed" : "Under Review"}
+          {isReplied ? "Processed" : "Pending"}
         </Badge>
       );
     } else {
       return (
         <Badge color={isReplied ? "success" : "warning"} pill>
-          {isReplied ? "Replied" : "Non-Reply"}
+          {isReplied ? "Replied" : "Unreplied"}
         </Badge>
       );
     }
@@ -147,12 +147,14 @@ const MailTable = ({
   };
 
   return (
-    <Table className="align-items-center table-flush" responsive>
+    <div className="mail-table-container">
+      <Table className="align-items-center table-flush" responsive>
       <thead className="thead-light">
         <tr>
           {showCheckboxes && (
             <th
               scope="col"
+              className="sticky-checkbox"
               style={{
                 ...stickyCheckboxStyle,
                 textAlign: "center",
@@ -179,7 +181,7 @@ const MailTable = ({
             <th scope="col">Date</th>
           )}
           <th scope="col">{getDeadlineColumnTitle()}</th>
-          {mailType === "review" && <th scope="col">OG Category</th>}
+                {mailType === "review" && <th scope="col">Category</th>}
           <th scope="col" />
         </tr>
       </thead>
@@ -196,6 +198,7 @@ const MailTable = ({
             <tr key={uniqueKey}>
               {showCheckboxes && (
                 <td
+                  className="sticky-checkbox"
                   style={{
                     ...stickyCheckboxStyle,
                     textAlign: "center",
@@ -349,10 +352,22 @@ const MailTable = ({
               {mailType === "review" && (
                 <td>
                   {(() => {
+<<<<<<< HEAD
                     // NEW LOGIC: ALWAYS show Original Category for ALL review mails
                     // Reason: All mails from Valid/Expired now go to "processed" folder
                     // We still need to show their original category (Valid/Expired)
 
+=======
+                    // Check reply status - only show OG Category if status is "Pending"
+                    const isReplied = getReplyStatusFromMail(mail);
+                    
+                    // Hide OG Category if Reply Status is "Processed" (isReplied = true)
+                    if (isReplied) {
+                      return null;
+                    }
+                    
+                    // Show OG Category only when Reply Status is "Pending" (isReplied = false)
+>>>>>>> c60f2993ad775ada0a775ccda1f1abcd3496cd30
                     // Use getOriginalCategory utility function
                     // This reads mail.originalCategory or calculates from Date sent
                     const status = getOriginalCategory(mail);
@@ -466,7 +481,8 @@ const MailTable = ({
           );
         })}
       </tbody>
-    </Table>
+      </Table>
+    </div>
   );
 };
 

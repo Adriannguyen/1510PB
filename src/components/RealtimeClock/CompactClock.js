@@ -30,17 +30,22 @@ const CompactClock = ({ className = '', style = {} }) => {
 
   return (
     <div 
-      className={`d-flex align-items-center ${className}`}
-      style={{ fontSize: '0.875rem', ...style }}
+      className={`d-flex flex-column ${className}`}
+      style={{ fontSize: '1.75rem', ...style }}
     >
-      <i className="ni ni-time-alarm mr-2" style={{ fontSize: '14px',  }}></i>
-      <div className="d-flex flex-column">
-        <div style={{ fontSize: '0.75rem', lineHeight: '1' }}>
-          {getVietnameseDayOfWeek(currentTime)}
+      {/*
+      <div className="d-flex align-items-center">
+        <i className="ni ni-time-alarm mr-2" style={{ fontSize: '28px',  }}></i>
+        <div style={{ fontSize: '1.4rem', lineHeight: '1', color: 'black', fontWeight: '500' }}>
+          Real Time:
         </div>
-        <div style={{ fontSize: '0.875rem', lineHeight: '1.2', fontWeight: '600' }}>
-          {formatDateTime(currentTime)}
-        </div>
+      </div>
+      */}
+      <div style={{ fontSize: '1.15rem', lineHeight: '1', color: 'white' }}>
+        {getVietnameseDayOfWeek(currentTime)}
+      </div>
+      <div style={{ fontSize: '1.15rem', lineHeight: '1.2', fontWeight: '600', color: 'white' }}>
+        {formatDateTime(currentTime)}
       </div>
     </div>
   );

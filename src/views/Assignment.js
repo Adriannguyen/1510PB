@@ -28,7 +28,7 @@ import {
 import withAdminAuth from "components/Auth/withAdminAuth.jsx";
 import CompactHeader from "components/Headers/CompactHeader.js";
 import { API_BASE_URL } from "constants/api.js";
-// CSS for avatar
+// CSS for avatar and modal width
 const avatarStyles = `
   .avatar {
     width: 2.5rem;
@@ -50,6 +50,33 @@ const avatarStyles = `
     border-radius: 50%;
     font-weight: 600;
     font-size: 0.875rem;
+  }
+  
+  /* Modal width optimization */
+  .assignment-modal .modal-dialog {
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+  
+  .assignment-modal .modal-content {
+    width: 100%;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .assignment-modal .modal-dialog {
+      max-width: 98vw !important;
+      width: 98vw !important;
+      margin: 10px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .assignment-modal .modal-dialog {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      margin: 0;
+    }
   }
 `;
 
@@ -98,10 +125,10 @@ const MemberRow = ({ memberEmail, index, onEdit, onDelete }) => {
             onClick={handleSave}
             disabled={!editEmail || !editEmail.includes("@")}
           >
-            <i className="fas fa-check" />
+            Save
           </Button>
           <Button color="secondary" size="sm" onClick={handleCancel}>
-            <i className="fas fa-times" />
+            Cancel
           </Button>
         </td>
       </tr>
@@ -121,10 +148,10 @@ const MemberRow = ({ memberEmail, index, onEdit, onDelete }) => {
           className="mr-1"
           onClick={() => setIsEditing(true)}
         >
-          <i className="fas fa-edit" />
+          Edit
         </Button>
         <Button color="danger" size="sm" onClick={() => onDelete(index)}>
-          <i className="fas fa-trash" />
+          Delete
         </Button>
       </td>
     </tr>
@@ -1022,7 +1049,7 @@ const Assignment = () => {
                     onClick={() => handleResetPassword(user)}
                     title="Reset Password"
                   >
-                    <i className="fas fa-key" />
+                    Reset PW
                   </Button>
                   <Button
                     color="warning"
@@ -1030,7 +1057,7 @@ const Assignment = () => {
                     className="mr-1"
                     onClick={() => handleEditUser(user)}
                   >
-                    <i className="fas fa-edit" />
+                    Edit
                   </Button>
                   <Button
                     color="danger"
@@ -1041,7 +1068,7 @@ const Assignment = () => {
                       users.filter((u) => u.isAdmin).length === 1
                     }
                   >
-                    <i className="fas fa-trash" />
+                    Delete
                   </Button>
                 </td>
               </tr>
@@ -1321,7 +1348,7 @@ const Assignment = () => {
                       className="mr-2"
                       onClick={() => handleEditGroupPics(group)}
                     >
-                      <i className="ni ni-settings mr-1" />
+                      {/* <i className="ni ni-settings mr-1" /> */}
                       Manage PICs
                     </Button>
                   </td>
@@ -1340,7 +1367,7 @@ const Assignment = () => {
         subtitle="Manage user accounts and permissions"
         icon="ni ni-single-02"
       />
-      <Container className="mt--5 compact-layout" fluid>
+      <Container className="mt--7 compact-layout" fluid>
         {error && (
           <Alert color="danger" toggle={() => setError("")}>
             {error}
@@ -1424,7 +1451,8 @@ const Assignment = () => {
         {/* Group Modal */}
         <Modal
           isOpen={groupModal}
-          size="lg"
+          size="xl"
+          className="assignment-modal"
           toggle={() => {
             setGroupModal(!groupModal);
             if (!groupModal) {
@@ -1503,7 +1531,7 @@ const Assignment = () => {
                         }
                         block
                       >
-                        <i className="fas fa-plus mr-1" />
+                        {/* <i className="fas fa-plus mr-1" /> */}
                         Add
                       </Button>
                     </Col>
@@ -1514,7 +1542,7 @@ const Assignment = () => {
               {/* Current Members List */}
               {groupForm.members.length > 0 && (
                 <div className="mb-3">
-                  <h6 className="mb-2">Current Members</h6>
+                  <h6 className="mb-2"><big>Current Members</big></h6>
                   <Table size="sm" responsive>
                     <thead>
                       <tr>
@@ -1570,7 +1598,8 @@ const Assignment = () => {
         {/* PIC Modal */}
         <Modal
           isOpen={picModal}
-          size="lg"
+          size="xl"
+          className="assignment-modal"
           toggle={() => {
             setPicModal(!picModal);
             if (!picModal) {
@@ -1615,9 +1644,8 @@ const Assignment = () => {
                 />
               </FormGroup>
               <div className="mt-3 p-3 bg-light rounded">
-                <small className="text-muted">
-                  <i className="ni ni-info-circle mr-1" />
-                  <strong>Note:</strong> After creating the PIC, you can assign
+                <small className="text-black">
+                  <strong>Note: </strong> After creating the PIC, you can assign
                   them to groups and set leadership roles in the "Assign PIC to
                   Group" tab.
                 </small>
@@ -1647,7 +1675,8 @@ const Assignment = () => {
         {/* User Modal */}
         <Modal
           isOpen={userModal}
-          size="lg"
+          size="xl"
+          className="assignment-modal"
           toggle={() => {
             setUserModal(!userModal);
             if (!userModal) {
@@ -1846,7 +1875,7 @@ const Assignment = () => {
         </Modal>
 
         {/* Group PICs Management Modal */}
-        <Modal isOpen={groupPicsModal} size="lg">
+        <Modal isOpen={groupPicsModal} size="xl" className="assignment-modal">
           <ModalHeader toggle={() => setGroupPicsModal(false)}>
             Manage PICs for {editingGroupForPics?.name}
           </ModalHeader>
@@ -2090,7 +2119,7 @@ const Assignment = () => {
                 setTimeout(() => setSuccess(""), 2000);
               }}
             >
-              <i className="fas fa-copy mr-2" />
+              {/* <i className="fas fa-copy mr-2" /> */}
               Copy Password
             </Button>
             <Button

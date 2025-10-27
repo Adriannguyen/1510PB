@@ -30,14 +30,14 @@ const Login = () => {
               <div className="copyright text-center text-xl-left text-muted">
                 © {new Date().getFullYear()}{" "}
                 <a className="font-weight-bold ml-1" target="_blank">
-                  Phu.duc.ng Note
+                  Prompt Box
                 </a>
               </div>
             </Col>
             <Col xl="6">
               <Nav className="nav-footer justify-content-center justify-content-xl-end">
                 <NavItem>
-                  <NavLink className="font-weight-bold ml-1" target="_blank">Phu.duc.ng Note</NavLink>
+                  <NavLink className="font-weight-bold ml-1" target="_blank">AI-driven Mail System</NavLink>
                 </NavItem>
 
                 <NavItem>

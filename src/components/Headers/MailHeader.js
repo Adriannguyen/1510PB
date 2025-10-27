@@ -55,14 +55,19 @@ const MailHeader = () => {
 
   return (
     <>
+      {/* Blue background only - no cards */}
       <div
-        className="header bg-gradient-info pb-4 pt-3 pt-md-4"
-        style={{ position: "relative", zIndex: 1 }}
-      >
-        <Container fluid>
-          <div className="header-body">
-            {/* Card stats - 8 cards layout */}
-            <Row>
+        className="header bg-gradient-info"
+        style={{ 
+          position: "relative", 
+          zIndex: 1,
+          height: "150px" // Fixed height for background only
+        }}
+      />
+      
+      {/* Cards on white background */}
+      <Container fluid style={{ marginTop: "-135px", position: "relative", zIndex: 2 }}>
+        <Row>
               {/* Card 1: Total Mails */}
               <Col lg="6" xl="3">
                 <Card
@@ -83,7 +88,7 @@ const MailHeader = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Total Mails
+                          Total 
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
                           {mailStats.total}
@@ -125,7 +130,7 @@ const MailHeader = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Valid
+                          On-time
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
                           {mailStats.valid}
@@ -168,7 +173,7 @@ const MailHeader = () => {
                           tag="h5"
                           className="text-uppercase text-muted mb-0"
                         >
-                          Expired
+                          Overdue
                         </CardTitle>
                         <span className="h2 font-weight-bold mb-0">
                           {mailStats.expired}
@@ -225,7 +230,7 @@ const MailHeader = () => {
                     </Row>
                     <p className="mt-3 mb-0 text-muted text-sm">
                       <span className="text-primary mr-2">
-                        <i className="ni ni-atom" />
+                        <i className="ni ni-zoom-split-in" />
                         {mailStats.total > 0
                           ? Math.round(
                               ((mailStats.reviewMailCount || 0) /
@@ -241,9 +246,7 @@ const MailHeader = () => {
                 </Card>
               </Col>
             </Row>
-          </div>
         </Container>
-      </div>
     </>
   );
 };

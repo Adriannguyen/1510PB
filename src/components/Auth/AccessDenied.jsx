@@ -105,7 +105,7 @@ const AccessDenied = ({
                           block
                           onClick={handleGoHome}
                         >
-                          <i className="ni ni-tv-2 mr-2"></i>
+                          {/* <i className="ni ni-tv-2 mr-2"></i> */}
                           Go to Dashboard
                         </Button>
                       </Col>
@@ -117,7 +117,7 @@ const AccessDenied = ({
                           block
                           onClick={handleGoBack}
                         >
-                          <i className="ni ni-bold-left mr-2"></i>
+                          {/* <i className="ni ni-bold-left mr-2"></i> */}
                           Go Back
                         </Button>
                       </Col>
@@ -148,7 +148,7 @@ const AccessDenied = ({
                             block
                             onClick={handleLogout}
                           >
-                            <i className="ni ni-user-run mr-2"></i>
+                            {/* <i className="ni ni-user-run mr-2"></i> */}
                             Login as Different User
                           </Button>
                         </Col>
