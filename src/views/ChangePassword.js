@@ -162,16 +162,19 @@ const ChangePassword = () => {
     setIsChanging(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/${user.username}/change-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/${user.username}/change-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -234,7 +237,10 @@ const ChangePassword = () => {
               </CardHeader>
               <CardBody>
                 {message.text && (
-                  <Alert color={message.type} toggle={() => setMessage({ type: "", text: "" })}>
+                  <Alert
+                    color={message.type}
+                    toggle={() => setMessage({ type: "", text: "" })}
+                  >
                     {message.text}
                   </Alert>
                 )}
@@ -246,7 +252,10 @@ const ChangePassword = () => {
                   <div className="pl-lg-4">
                     {/* Current Password */}
                     <FormGroup>
-                      <label className="form-control-label" htmlFor="currentPassword">
+                      <label
+                        className="form-control-label"
+                        htmlFor="currentPassword"
+                      >
                         Current Password <span className="text-danger">*</span>
                       </label>
                       <InputGroup>
@@ -267,7 +276,9 @@ const ChangePassword = () => {
                           >
                             <i
                               className={`ni ${
-                                showPasswords.current ? "ni-bold-down" : "ni-bold-right"
+                                showPasswords.current
+                                  ? "ni-bold-down"
+                                  : "ni-bold-right"
                               }`}
                             />
                           </InputGroupText>
@@ -279,7 +290,10 @@ const ChangePassword = () => {
 
                     {/* New Password */}
                     <FormGroup>
-                      <label className="form-control-label" htmlFor="newPassword">
+                      <label
+                        className="form-control-label"
+                        htmlFor="newPassword"
+                      >
                         New Password <span className="text-danger">*</span>
                       </label>
                       <InputGroup>
@@ -300,26 +314,36 @@ const ChangePassword = () => {
                           >
                             <i
                               className={`ni ${
-                                showPasswords.new ? "ni-bold-down" : "ni-bold-right"
+                                showPasswords.new
+                                  ? "ni-bold-down"
+                                  : "ni-bold-right"
                               }`}
                             />
                           </InputGroupText>
                         </InputGroupAddon>
                       </InputGroup>
                       {passwordStrength.text && (
-                        <small className={`text-${passwordStrength.color} mt-2 d-block`}>
-                          Password Strength: <strong>{passwordStrength.text}</strong>
+                        <small
+                          className={`text-${passwordStrength.color} mt-2 d-block`}
+                        >
+                          Password Strength:{" "}
+                          <strong>{passwordStrength.text}</strong>
                         </small>
                       )}
                       <small className="text-muted mt-1 d-block">
-                        Use 8+ characters with a mix of letters, numbers & symbols
+                        Use 8+ characters with a mix of letters, numbers &
+                        symbols
                       </small>
                     </FormGroup>
 
                     {/* Confirm Password */}
                     <FormGroup>
-                      <label className="form-control-label" htmlFor="confirmPassword">
-                        Confirm New Password <span className="text-danger">*</span>
+                      <label
+                        className="form-control-label"
+                        htmlFor="confirmPassword"
+                      >
+                        Confirm New Password{" "}
+                        <span className="text-danger">*</span>
                       </label>
                       <InputGroup>
                         <Input
@@ -339,20 +363,24 @@ const ChangePassword = () => {
                           >
                             <i
                               className={`ni ${
-                                showPasswords.confirm ? "ni-bold-down" : "ni-bold-right"
+                                showPasswords.confirm
+                                  ? "ni-bold-down"
+                                  : "ni-bold-right"
                               }`}
                             />
                           </InputGroupText>
                         </InputGroupAddon>
                       </InputGroup>
                       {passwordData.confirmPassword &&
-                        passwordData.newPassword !== passwordData.confirmPassword && (
+                        passwordData.newPassword !==
+                          passwordData.confirmPassword && (
                           <small className="text-danger mt-2 d-block">
                             Passwords do not match
                           </small>
                         )}
                       {passwordData.confirmPassword &&
-                        passwordData.newPassword === passwordData.confirmPassword && (
+                        passwordData.newPassword ===
+                          passwordData.confirmPassword && (
                           <small className="text-success mt-2 d-block">
                             <i className="ni ni-check-bold mr-1"></i>
                             Passwords match

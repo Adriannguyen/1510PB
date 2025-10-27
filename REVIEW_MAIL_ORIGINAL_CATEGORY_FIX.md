@@ -3,11 +3,13 @@
 ## 📋 Tổng quan
 
 ### Vấn đề ban đầu
+
 - **BUG NGHIÊM TRỌNG**: Tất cả mail trong folder `ReviewMail/pending` bị tự động MOVE sang folder `ReviewMail/processed` sau 24 giờ
 - Hàm `autoExpireReviewMails()` đang PHYSICALLY MOVE files giữa các folder
 - Vi phạm yêu cầu nghiệp vụ: "mail đang ở folder nào thì để ở nguyên folder đó"
 
 ### Giải pháp
+
 - **LOẠI BỎ** logic di chuyển file tự động
 - **THÊM** field `originalCategory` để tracking trạng thái Valid/Expired
 - Field `originalCategory` tự động cập nhật mỗi giờ dựa trên Date sent
@@ -26,18 +28,21 @@ const calculateOriginalCategory = (mailDate) => {
   // Parse date (array format hoặc ISO string)
   // Tính số giờ kể từ khi gửi
   // Return: "Valid" nếu < 24h, "Expired" nếu >= 24h
-}
+};
 ```
 
 **Đầu vào:**
+
 - `mailDate`: Array format `["YYYY-MM-DD", "HH:MM"]` hoặc ISO string
 
 **Đầu ra:**
+
 - `"Valid"`: Mail được gửi trong vòng 24 giờ
 - `"Expired"`: Mail được gửi hơn 24 giờ
 - `null`: Lỗi hoặc không parse được date
 
 **Logic:**
+
 ```
 hoursDifference = (currentTime - mailDate) / (1000 * 60 * 60)
 if (hoursDifference < 24) → "Valid"
@@ -49,6 +54,7 @@ else → "Expired"
 #### B. Rewritten Function: `autoExpireReviewMails()` (Lines 810-950)
 
 **Trước đây (BUG):**
+
 ```javascript
 // ❌ OLD - MOVED FILES
 const autoExpireReviewMails = () => {
@@ -56,10 +62,11 @@ const autoExpireReviewMails = () => {
   // Move files to processed folder after 24h
   // DELETE from old location
   // WRITE to new location
-}
+};
 ```
 
 **Hiện tại (FIX):**
+
 ```javascript
 // ✅ NEW - UPDATE FIELD ONLY
 const autoExpireReviewMails = () => {
@@ -68,10 +75,11 @@ const autoExpireReviewMails = () => {
   // UPDATE originalCategory field in same file
   // NO FILE MOVEMENT
   // Return {updatedCount, errors}
-}
+};
 ```
 
 **Hoạt động:**
+
 1. Quét cả 2 folder: `ReviewMail/pending` và `ReviewMail/processed`
 2. Đọc từng file mail
 3. Tính toán `originalCategory` mới bằng `calculateOriginalCategory()`
@@ -81,6 +89,7 @@ const autoExpireReviewMails = () => {
 7. Log các thay đổi
 
 **Return value:**
+
 ```javascript
 {
   updatedCount: number,  // Số mail được update
@@ -103,7 +112,7 @@ allMails.push({
   originalCategory: calculateOriginalCategory(mailData.Date),
   isExpired: false,
   isReplied: false,
-  ...enrichedMail
+  ...enrichedMail,
 });
 
 // For ReviewMail/processed
@@ -114,11 +123,12 @@ allMails.push({
   originalCategory: calculateOriginalCategory(mailData.Date),
   isExpired: false,
   isReplied: true,
-  ...enrichedMail
+  ...enrichedMail,
 });
 ```
 
 **Mục đích:**
+
 - Đảm bảo mọi mail khi load đều có field `originalCategory`
 - Tính toán real-time nếu chưa có hoặc outdated
 - Set đúng `status` dựa trên folder path
@@ -128,6 +138,7 @@ allMails.push({
 #### D. Updated Server Startup Job (Lines 5300-5330)
 
 **Thay đổi:**
+
 ```javascript
 // Before: AUTO_EXPIRE_INTERVAL + "auto-expire"
 // After: AUTO_UPDATE_INTERVAL + "category update"
@@ -136,14 +147,16 @@ const AUTO_UPDATE_INTERVAL = 60 * 60 * 1000; // 1 hour
 
 setInterval(() => {
   const result = autoExpireReviewMails();
-  console.log(`📊 Category update completed: ${result.updatedCount} mails updated`);
-  
+  console.log(
+    `📊 Category update completed: ${result.updatedCount} mails updated`
+  );
+
   // Broadcast to clients
-  io.emit("categoryUpdated", { 
+  io.emit("categoryUpdated", {
     count: result.updatedCount,
-    timestamp: new Date()
+    timestamp: new Date(),
   });
-  
+
   // Rescan mail stats
   broadcastMailStats();
 }, AUTO_UPDATE_INTERVAL);
@@ -152,6 +165,7 @@ setInterval(() => {
 **Tần suất:** Chạy mỗi 1 giờ (3600 seconds)
 
 **Broadcast event:**
+
 - Event name: `"categoryUpdated"` (thay vì `"autoExpired"`)
 - Payload: `{ count, timestamp }`
 - Trigger UI refresh để hiển thị category mới
@@ -187,6 +201,7 @@ export const getOriginalCategory = (mail) => {
 ```
 
 **Return format:**
+
 ```javascript
 {
   text: "Valid" | "Expired" | "Unknown",
@@ -199,30 +214,34 @@ export const getOriginalCategory = (mail) => {
 #### B. Display in MailTable (`MailTable.js` Lines 345-362)
 
 **Conditional rendering:**
+
 ```javascript
-{mailType === "review" && (
-  <td>
-    {(() => {
-      // Hide OG Category if mail is Processed (replied)
-      const isReplied = getReplyStatusFromMail(mail);
-      if (isReplied) {
-        return null;
-      }
+{
+  mailType === "review" && (
+    <td>
+      {(() => {
+        // Hide OG Category if mail is Processed (replied)
+        const isReplied = getReplyStatusFromMail(mail);
+        if (isReplied) {
+          return null;
+        }
 
-      // Get originalCategory from mail data or calculate
-      const status = getOriginalCategory(mail);
+        // Get originalCategory from mail data or calculate
+        const status = getOriginalCategory(mail);
 
-      return (
-        <Badge color={status.color} pill>
-          {status.text}
-        </Badge>
-      );
-    })()}
-  </td>
-)}
+        return (
+          <Badge color={status.color} pill>
+            {status.text}
+          </Badge>
+        );
+      })()}
+    </td>
+  );
+}
 ```
 
 **Hiển thị:**
+
 - ✅ CHỈ hiển thị cho mail **Under Review** (pending)
 - ❌ KHÔNG hiển thị cho mail **Processed** (reviewed/completed)
 - Badge màu xanh (success): "Valid"
@@ -236,33 +255,45 @@ export const getOriginalCategory = (mail) => {
 
 ```javascript
 // Convert originalCategory to folder category
-if (mailData.originalCategory === "Valid" || mailData.originalCategory === "DungHan") {
+if (
+  mailData.originalCategory === "Valid" ||
+  mailData.originalCategory === "DungHan"
+) {
   // Valid mails
   targetCategory = "DungHan";
   targetStatus = currentReviewStatus === "processed" ? "rep" : "mustRep";
-} else if (mailData.originalCategory === "Expired" || mailData.originalCategory === "QuaHan") {
+} else if (
+  mailData.originalCategory === "Expired" ||
+  mailData.originalCategory === "QuaHan"
+) {
   // Expired mails
   targetCategory = "QuaHan";
   targetStatus = currentReviewStatus === "processed" ? "daRep" : "chuaRep";
 } else {
   // Fallback: determine by isExpired
   targetCategory = mailData.isExpired ? "QuaHan" : "DungHan";
-  targetStatus = currentReviewStatus === "processed" ? 
-    (mailData.isExpired ? "daRep" : "rep") : 
-    (mailData.isExpired ? "chuaRep" : "mustRep");
+  targetStatus =
+    currentReviewStatus === "processed"
+      ? mailData.isExpired
+        ? "daRep"
+        : "rep"
+      : mailData.isExpired
+      ? "chuaRep"
+      : "mustRep";
 }
 ```
 
 **Mapping table:**
 
 | originalCategory | Review Status | Target Category | Target Status |
-|-----------------|---------------|-----------------|---------------|
-| Valid           | Under Review  | DungHan         | mustRep       |
-| Valid           | Processed     | DungHan         | rep           |
-| Expired         | Under Review  | QuaHan          | chuaRep       |
-| Expired         | Processed     | QuaHan          | daRep         |
+| ---------------- | ------------- | --------------- | ------------- |
+| Valid            | Under Review  | DungHan         | mustRep       |
+| Valid            | Processed     | DungHan         | rep           |
+| Expired          | Under Review  | QuaHan          | chuaRep       |
+| Expired          | Processed     | QuaHan          | daRep         |
 
 **Logic:**
+
 1. Đọc `originalCategory` từ mail data
 2. Xác định `targetCategory` (DungHan/QuaHan)
 3. Xác định `targetStatus` dựa trên review status (pending/processed)
@@ -274,6 +305,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ## 📊 Data Flow
 
 ### Flow 1: Mail được Move To Review
+
 ```
 1. User click "Move to Review" trên Valid/Expired mail
 2. Backend tính originalCategory = calculateOriginalCategory(mail.Date)
@@ -282,6 +314,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ```
 
 ### Flow 2: Auto-Update Job (Mỗi giờ)
+
 ```
 1. Server chạy autoExpireReviewMails() mỗi 1 giờ
 2. Scan tất cả file trong ReviewMail/pending và ReviewMail/processed
@@ -293,6 +326,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ```
 
 ### Flow 3: Move Back từ Review
+
 ```
 1. User click "Move Return" trên ReviewMail
 2. Backend đọc originalCategory từ mail data
@@ -308,6 +342,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ## 🧪 Testing Checklist
 
 ### Test 1: Auto-Update Job
+
 - [ ] Tạo mail mới trong ReviewMail/pending với Date < 24h
 - [ ] Verify originalCategory = "Valid"
 - [ ] Đợi 24+ giờ (hoặc modify date để test)
@@ -315,12 +350,14 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 - [ ] Verify file VẪN Ở ReviewMail/pending (không move)
 
 ### Test 2: Display Logic
+
 - [ ] Mail Under Review có originalCategory "Valid" → Badge xanh "Valid"
 - [ ] Mail Under Review có originalCategory "Expired" → Badge đỏ "Expired"
 - [ ] Mail Processed (reviewed) → KHÔNG hiển thị OG Category
 - [ ] Tab switching (All/Under Review/Processed) hoạt động đúng
 
 ### Test 3: Move-Back Logic
+
 - [ ] Under Review + Valid → Move về DungHan/mustRep
 - [ ] Under Review + Expired → Move về QuaHan/chuaRep
 - [ ] Processed + Valid → Move về DungHan/rep
@@ -329,6 +366,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 - [ ] File XUẤT HIỆN ở folder đích
 
 ### Test 4: Real-time Sync
+
 - [ ] Sau khi auto-update chạy, verify WebSocket broadcast
 - [ ] Verify UI tự động refresh without manual reload
 - [ ] Verify Badge color update real-time
@@ -339,7 +377,9 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ## 🐛 Troubleshooting
 
 ### Issue: originalCategory không hiển thị
+
 **Kiểm tra:**
+
 1. Backend có tính toán và lưu field originalCategory không?
    ```bash
    # Check file content
@@ -347,12 +387,14 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
    ```
 2. Frontend có đọc đúng field không?
    ```javascript
-   console.log('Mail data:', mail);
-   console.log('Original Category:', mail.originalCategory);
+   console.log("Mail data:", mail);
+   console.log("Original Category:", mail.originalCategory);
    ```
 
 ### Issue: Category không tự động update
+
 **Kiểm tra:**
+
 1. Server log có thông báo category update không?
    ```
    📊 Category update completed: X mails updated
@@ -364,16 +406,18 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
    ```
 
 ### Issue: Move-back về sai folder
+
 **Kiểm tra:**
+
 1. originalCategory có giá trị đúng không?
 2. Review status (pending/processed) có đúng không?
 3. Mapping logic có khớp với bảng ở trên không?
 4. Log ra để debug:
    ```javascript
-   console.log('originalCategory:', mailData.originalCategory);
-   console.log('currentReviewStatus:', currentReviewStatus);
-   console.log('targetCategory:', targetCategory);
-   console.log('targetStatus:', targetStatus);
+   console.log("originalCategory:", mailData.originalCategory);
+   console.log("currentReviewStatus:", currentReviewStatus);
+   console.log("targetCategory:", targetCategory);
+   console.log("targetStatus:", targetStatus);
    ```
 
 ---
@@ -381,6 +425,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ## 📝 Summary
 
 ### Key Changes
+
 1. ✅ **Backend**: Thêm `calculateOriginalCategory()` helper
 2. ✅ **Backend**: Rewrite `autoExpireReviewMails()` - NO FILE MOVEMENT
 3. ✅ **Backend**: Update `loadAllMails()` - add originalCategory
@@ -390,6 +435,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 7. ✅ **API**: Update move-back logic - support new originalCategory format
 
 ### Business Logic
+
 - **originalCategory = "Valid"**: Mail được gửi < 24 giờ
 - **originalCategory = "Expired"**: Mail được gửi >= 24 giờ
 - **Auto-update**: Mỗi 1 giờ tự động kiểm tra và update category
@@ -397,11 +443,13 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 - **Display**: CHỈ hiển thị OG Category cho mail Under Review
 
 ### Files Modified
+
 1. `mail-server/server.js` (4 locations)
 2. `src/utils/replyStatusUtils.js` (1 function)
 3. `src/components/MailTable/MailTable.js` (already implemented)
 
 ### Migration Note
+
 - Hỗ trợ cả format cũ và mới:
   - Old: `"DungHan"` / `"QuaHan"`
   - New: `"Valid"` / `"Expired"`

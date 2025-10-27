@@ -352,7 +352,7 @@ const MailTable = ({
                     // NEW LOGIC: ALWAYS show Original Category for ALL review mails
                     // Reason: All mails from Valid/Expired now go to "processed" folder
                     // We still need to show their original category (Valid/Expired)
-                    
+
                     // Use getOriginalCategory utility function
                     // This reads mail.originalCategory or calculates from Date sent
                     const status = getOriginalCategory(mail);

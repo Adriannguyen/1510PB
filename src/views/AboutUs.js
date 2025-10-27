@@ -127,17 +127,22 @@ const AboutUs = () => {
                         Advanced Email Tracking & Assignment Platform
                       </h2>
                       <p className="lead text-muted mb-0">
-                        A comprehensive solution for managing, tracking, and organizing
-                        emails with real-time updates, smart assignment, and powerful
-                        analytics. Built with modern technologies for optimal performance
-                        and user experience.
+                        A comprehensive solution for managing, tracking, and
+                        organizing emails with real-time updates, smart
+                        assignment, and powerful analytics. Built with modern
+                        technologies for optimal performance and user
+                        experience.
                       </p>
                     </div>
                   </Col>
                   <Col lg="4" className="text-center">
                     <div
                       className="icon icon-shape bg-gradient-primary shadow rounded-circle text-white"
-                      style={{ width: "150px", height: "150px", margin: "0 auto" }}
+                      style={{
+                        width: "150px",
+                        height: "150px",
+                        margin: "0 auto",
+                      }}
                     >
                       <i
                         className="ni ni-email-83"
@@ -159,7 +164,9 @@ const AboutUs = () => {
                 <CardBody>
                   <Row>
                     <div className="col">
-                      <span className="h2 font-weight-bold mb-0">{stat.value}</span>
+                      <span className="h2 font-weight-bold mb-0">
+                        {stat.value}
+                      </span>
                       <p className="mt-2 mb-0 text-muted text-sm">
                         <i className={`${stat.icon} mr-2`}></i>
                         {stat.label}
@@ -199,7 +206,9 @@ const AboutUs = () => {
                         </div>
                         <div>
                           <h3 className="mb-2">{feature.title}</h3>
-                          <p className="text-muted mb-0">{feature.description}</p>
+                          <p className="text-muted mb-0">
+                            {feature.description}
+                          </p>
                         </div>
                       </div>
                     </Col>
@@ -254,7 +263,9 @@ const AboutUs = () => {
                 {teamMembers.map((member, index) => (
                   <div
                     className={`media align-items-center ${
-                      index < teamMembers.length - 1 ? "mb-4 pb-4 border-bottom" : ""
+                      index < teamMembers.length - 1
+                        ? "mb-4 pb-4 border-bottom"
+                        : ""
                     }`}
                     key={index}
                   >
@@ -337,8 +348,9 @@ const AboutUs = () => {
                       </div>
                       <h3>Frontend Layer</h3>
                       <p className="text-muted">
-                        React 18 with Reactstrap components, Context API for state
-                        management, and Socket.io client for real-time updates
+                        React 18 with Reactstrap components, Context API for
+                        state management, and Socket.io client for real-time
+                        updates
                       </p>
                     </div>
                   </Col>
@@ -361,8 +373,8 @@ const AboutUs = () => {
                       </div>
                       <h3>Data Layer</h3>
                       <p className="text-muted">
-                        JSON file-based storage system with automatic categorization,
-                        encryption support, and group management
+                        JSON file-based storage system with automatic
+                        categorization, encryption support, and group management
                       </p>
                     </div>
                   </Col>
@@ -377,7 +389,9 @@ const AboutUs = () => {
           <Col>
             <Card className="shadow">
               <CardBody className="text-center py-4">
-                <h3 className="mb-3">Built with ❤️ using Argon Dashboard React</h3>
+                <h3 className="mb-3">
+                  Built with ❤️ using Argon Dashboard React
+                </h3>
                 <p className="text-muted mb-0">
                   <i className="ni ni-bulb-61 text-warning mr-2"></i>
                   Powered by modern web technologies and best practices

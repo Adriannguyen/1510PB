@@ -8,10 +8,7 @@
 */
 
 import React from "react";
-import {
-  Modal,
-  ModalBody,
-} from "reactstrap";
+import { Modal, ModalBody } from "reactstrap";
 
 const AboutUsModal = ({ isOpen, toggle }) => {
   return (
@@ -44,7 +41,9 @@ const AboutUsModal = ({ isOpen, toggle }) => {
                   marginBottom: "12px",
                 }}
               />
-              <h4 className="mb-0 font-weight-bold text-primary">MAIL SYSTEM</h4>
+              <h4 className="mb-0 font-weight-bold text-primary">
+                MAIL SYSTEM
+              </h4>
             </div>
           </div>
 
@@ -57,10 +56,16 @@ const AboutUsModal = ({ isOpen, toggle }) => {
               background: "linear-gradient(87deg, #f7f8f9 0, #ffffff 100%)",
             }}
           >
-            <h5 className="font-weight-bold mb-2" style={{ color: "#32325d", fontSize: "1rem" }}>
+            <h5
+              className="font-weight-bold mb-2"
+              style={{ color: "#32325d", fontSize: "1rem" }}
+            >
               PROMPT BOX
             </h5>
-            <p className="mb-3 text-muted font-weight-600" style={{ fontSize: "0.875rem" }}>
+            <p
+              className="mb-3 text-muted font-weight-600"
+              style={{ fontSize: "0.875rem" }}
+            >
               Nguyễn Phú Đức
             </p>
 
@@ -103,11 +108,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
         </div>
 
         {/* Close Button */}
-        <button
-          onClick={toggle}
-          className="btn-close-modal"
-          aria-label="Close"
-        >
+        <button onClick={toggle} className="btn-close-modal" aria-label="Close">
           <i className="ni ni-fat-remove"></i>
         </button>
       </ModalBody>
@@ -118,7 +119,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
           display: flex !important;
           align-items: center !important;
         }
-        
+
         .about-us-modal .modal-dialog {
           max-width: 550px !important;
           width: 100% !important;
@@ -128,7 +129,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
           min-height: auto !important;
           max-height: none !important;
         }
-        
+
         .about-us-modal .modal-content {
           border-radius: 12px;
           border: none;
@@ -150,7 +151,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
           position: relative;
           height: auto !important;
         }
-        
+
         .about-us-modal .d-flex.align-items-stretch {
           min-height: auto !important;
           height: auto !important;
@@ -210,7 +211,7 @@ const AboutUsModal = ({ isOpen, toggle }) => {
             max-width: 95% !important;
             margin: 0 auto !important;
           }
-          
+
           .about-us-modal .d-flex.align-items-stretch {
             flex-direction: column !important;
           }

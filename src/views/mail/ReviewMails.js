@@ -199,31 +199,63 @@ const ReviewMails = () => {
     try {
       console.log("🚀 Starting to move selected mails back...");
 
-      // Move each selected mail back to original location
+      // Move each selected mail back
       for (const mailId of selectedMails) {
-        console.log(`🔍 Looking for mail with ID: ${mailId}`);
-
-        // Try to find mail in filteredMails first, then in all reviewMails
-        let mail = filteredMails.find(
+        const mail = reviewMails.find(
           (m) => (m.id || `${m.Subject}-${m.From}`) === mailId
         );
 
-        if (!mail) {
-          console.log(
-            `📋 Mail not found in filtered mails, searching in all review mails...`
-          );
-          mail = reviewMails.find(
-            (m) => (m.id || `${m.Subject}-${m.From}`) === mailId
-          );
-        }
-
         if (mail) {
-          console.log(`📧 Found mail: ${mail.Subject}`);
-          console.log(`📂 Original category: ${mail.originalCategory}`);
-          console.log(`📊 Original status: ${mail.originalStatus}`);
-          console.log("📤 Moving back to original location...");
+          console.log(`📤 Moving mail: ${mail.Subject}`);
+          await handleMoveBack(mail);
+        }
+      }
 
-          // Call API to move mail back
+      // Clear selection after moving
+      setSelectedMails([]);
+      console.log("✅ All selected mails moved back");
+    } catch (error) {
+      console.error("❌ Error moving selected mails:", error);
+    }
+  };
+
+  // Handle manual update of original category
+  const handleUpdateCategory = async () => {
+    try {
+      console.log("🔄 Manually updating original category for all ReviewMails...");
+      
+      const response = await fetch(
+        `${API_BASE_URL}/api/update-original-category`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(`✅ Category update completed: ${result.updatedCount} mail(s) updated`);
+
+        // Show success notification (optional)
+        alert(`Category updated successfully!\n${result.updatedCount} mail(s) updated.`);
+
+        // Refresh mail data
+        if (refreshMails) {
+          refreshMails();
+        }
+      } else {
+        throw new Error("Failed to update category");
+      }
+    } catch (error) {
+      console.error("❌ Error updating category:", error);
+      alert("Failed to update category. Please try again.");
+    }
+  };
+
+  // Handle assign modal
+  const handleAssignMail = (mail) => {          // Call API to move mail back
           const response = await fetch(
             `${API_BASE_URL}/api/move-back-from-review`,
             {

@@ -3,6 +3,7 @@
 ## 📋 Tổng quan thay đổi
 
 ### Yêu cầu mới
+
 1. **TẤT CẢ mail từ Valid Mails / Expired Mails khi move xuống Review → vào folder `processed` luôn**
 2. **Original Category (OG)** xác định khi move xuống dựa trên thời gian hiện tại:
    - Mail được gửi **< 24 giờ** → OG = `"Valid"`
@@ -10,6 +11,7 @@
 3. **Khi Move Back** → Luôn về folder **Replied** (rep/daRep) vì đã ở processed
 
 ### Lý do thay đổi
+
 - **Logic cũ**: Mail từ mustRep/chuaRep → pending, Mail từ rep/daRep → processed
 - **Logic mới**: **TẤT CẢ** → processed (vì khi move xuống Review nghĩa là đã xử lý/kiểm tra)
 - **Trường hợp đặc biệt**: Một số mail Expired vẫn ở Valid Mails (do tool BE chưa update kịp)
@@ -27,6 +29,7 @@
 #### A. Thay đổi logic xác định target folder
 
 **Trước đây:**
+
 ```javascript
 // ❌ OLD - Phụ thuộc vào folder nguồn
 let targetReviewFolder = "pending"; // default
@@ -38,6 +41,7 @@ if (lowerPath.includes("\\rep\\") || lowerPath.includes("/rep/")) {
 ```
 
 **Hiện tại:**
+
 ```javascript
 // ✅ NEW - TẤT CẢ đều vào processed
 const targetReviewFolder = "processed"; // Always processed
@@ -49,6 +53,7 @@ console.log(`📊 Calculated Original Category: ${originalCategory}`);
 ```
 
 **Logic mới:**
+
 1. **KHÔNG còn** check folder nguồn (rep/mustRep/daRep/chuaRep)
 2. **LUÔN LUÔN** set `targetReviewFolder = "processed"`
 3. **LUÔN LUÔN** set `shouldMarkAsReplied = true`
@@ -59,6 +64,7 @@ console.log(`📊 Calculated Original Category: ${originalCategory}`);
 #### B. Thay đổi cấu trúc reviewMailData
 
 **Trước đây:**
+
 ```javascript
 // ❌ OLD
 const reviewMailData = {
@@ -70,6 +76,7 @@ const reviewMailData = {
 ```
 
 **Hiện tại:**
+
 ```javascript
 // ✅ NEW
 const reviewMailData = {
@@ -84,6 +91,7 @@ const reviewMailData = {
 ```
 
 **Thay đổi:**
+
 - `originalCategory`: Giờ đây là giá trị **tính toán** từ `calculateOriginalCategory()`
 - `isReplied`: **LUÔN = true** (vì tất cả vào processed)
 - `processedDate`: **LUÔN có** timestamp
@@ -99,11 +107,17 @@ const reviewMailData = {
 ```javascript
 // IMPORTANT: Since all mails from Valid/Expired now go to "processed" folder,
 // they will ALWAYS move back to Replied folders (rep/daRep)
-if (mailData.originalCategory === "Valid" || mailData.originalCategory === "DungHan") {
+if (
+  mailData.originalCategory === "Valid" ||
+  mailData.originalCategory === "DungHan"
+) {
   // Valid mails: processed → rep (ALWAYS since all moved mails are processed)
   targetCategory = "DungHan";
   targetStatus = currentReviewStatus === "processed" ? "rep" : "mustRep";
-} else if (mailData.originalCategory === "Expired" || mailData.originalCategory === "QuaHan") {
+} else if (
+  mailData.originalCategory === "Expired" ||
+  mailData.originalCategory === "QuaHan"
+) {
   // Expired mails: processed → daRep (ALWAYS since all moved mails are processed)
   targetCategory = "QuaHan";
   targetStatus = currentReviewStatus === "processed" ? "daRep" : "chuaRep";
@@ -111,6 +125,7 @@ if (mailData.originalCategory === "Valid" || mailData.originalCategory === "Dung
 ```
 
 **Logic:**
+
 - Vì tất cả mail đều ở `processed` → `currentReviewStatus` sẽ LUÔN = `"processed"`
 - Valid mail → move về `DungHan/rep`
 - Expired mail → move về `QuaHan/daRep`
@@ -136,6 +151,7 @@ delete restoredMailData.processedDate; // ← Added: xóa processedDate
 ```
 
 **Thay đổi:**
+
 - `isReplied`: **LUÔN = true** (comment rõ ràng hơn)
 - `isExpired`: Xác định dựa trên `targetCategory` (QuaHan = expired)
 - **Thêm**: `delete restoredMailData.processedDate` để cleanup
@@ -149,44 +165,51 @@ delete restoredMailData.processedDate; // ← Added: xóa processedDate
 #### Thay đổi hiển thị OG Category
 
 **Trước đây:**
+
 ```javascript
 // ❌ OLD - KHÔNG hiển thị nếu Processed
-{mailType === "review" && (
-  <td>
-    {(() => {
-      const isReplied = getReplyStatusFromMail(mail);
-      if (isReplied) {
-        return null; // ← Ẩn OG Category nếu Processed
-      }
-      const status = getOriginalCategory(mail);
-      return <Badge color={status.color}>{status.text}</Badge>;
-    })()}
-  </td>
-)}
+{
+  mailType === "review" && (
+    <td>
+      {(() => {
+        const isReplied = getReplyStatusFromMail(mail);
+        if (isReplied) {
+          return null; // ← Ẩn OG Category nếu Processed
+        }
+        const status = getOriginalCategory(mail);
+        return <Badge color={status.color}>{status.text}</Badge>;
+      })()}
+    </td>
+  );
+}
 ```
 
 **Hiện tại:**
+
 ```javascript
 // ✅ NEW - LUÔN hiển thị OG Category
-{mailType === "review" && (
-  <td>
-    {(() => {
-      // ALWAYS show Original Category for ALL review mails
-      // Reason: All mails now go to "processed" folder
-      // We still need to show their original category
-      
-      const status = getOriginalCategory(mail);
-      return (
-        <Badge color={status.color} pill>
-          {status.text}
-        </Badge>
-      );
-    })()}
-  </td>
-)}
+{
+  mailType === "review" && (
+    <td>
+      {(() => {
+        // ALWAYS show Original Category for ALL review mails
+        // Reason: All mails now go to "processed" folder
+        // We still need to show their original category
+
+        const status = getOriginalCategory(mail);
+        return (
+          <Badge color={status.color} pill>
+            {status.text}
+          </Badge>
+        );
+      })()}
+    </td>
+  );
+}
 ```
 
 **Logic mới:**
+
 - **LOẠI BỎ** check `isReplied`
 - **LUÔN LUÔN** hiển thị OG Category Badge
 - Badge màu xanh (success): `"Valid"`
@@ -199,6 +222,7 @@ delete restoredMailData.processedDate; // ← Added: xóa processedDate
 ### Scenario 1: Valid Mail (DungHan/mustRep, Date < 24h)
 
 **1. Move to Review:**
+
 ```
 User clicks "Move to Review" trên Valid Mail (mustRep)
 ↓
@@ -224,6 +248,7 @@ UI: Review Mails tab
 ```
 
 **2. Move Back:**
+
 ```
 User clicks "Move Return"
 ↓
@@ -251,6 +276,7 @@ UI: Valid Mails tab
 ### Scenario 2: Expired Mail (QuaHan/chuaRep, Date >= 24h)
 
 **1. Move to Review:**
+
 ```
 User clicks "Move to Review" trên Expired Mail (chuaRep)
 ↓
@@ -276,6 +302,7 @@ UI: Review Mails tab
 ```
 
 **2. Move Back:**
+
 ```
 User clicks "Move Return"
 ↓
@@ -303,10 +330,12 @@ UI: Expired Mails tab
 ### Scenario 3: Expired mail vẫn ở Valid Mails (trường hợp đặc biệt)
 
 **Tình huống:**
+
 - Mail được gửi cách đây 3 ngày (> 24h)
 - Nhưng tool BE chưa update kịp → vẫn ở `DungHan/mustRep`
 
 **1. Move to Review:**
+
 ```
 User clicks "Move to Review" trên mail này
 ↓
@@ -330,6 +359,7 @@ UI: Review Mails tab
 ```
 
 **2. Move Back:**
+
 ```
 User clicks "Move Return"
 ↓
@@ -356,6 +386,7 @@ UI: Expired Mails tab (Replied section)
 ## 🧪 Testing Checklist
 
 ### Test 1: Valid Mail Move to Review
+
 - [ ] Valid Mail (DungHan/mustRep, Date < 24h)
 - [ ] Click "Move to Review"
 - [ ] Verify file vào `ReviewMail/processed/` (KHÔNG phải pending)
@@ -364,12 +395,14 @@ UI: Expired Mails tab (Replied section)
 - [ ] Verify UI hiển thị: Reply Status = "Processed", OG = "Valid" (xanh)
 
 ### Test 2: Valid Mail Move Back
+
 - [ ] Từ test 1, click "Move Return"
 - [ ] Verify file về `DungHan/rep/` (KHÔNG phải mustRep)
 - [ ] Verify `isReplied = true`, `isExpired = false`
 - [ ] Verify UI hiển thị trong Valid Mails / Replied section
 
 ### Test 3: Expired Mail Move to Review
+
 - [ ] Expired Mail (QuaHan/chuaRep, Date >= 24h)
 - [ ] Click "Move to Review"
 - [ ] Verify file vào `ReviewMail/processed/`
@@ -377,12 +410,14 @@ UI: Expired Mails tab (Replied section)
 - [ ] Verify UI hiển thị: Reply Status = "Processed", OG = "Expired" (đỏ)
 
 ### Test 4: Expired Mail Move Back
+
 - [ ] Từ test 3, click "Move Return"
 - [ ] Verify file về `QuaHan/daRep/` (KHÔNG phải chuaRep)
 - [ ] Verify `isReplied = true`, `isExpired = true`
 - [ ] Verify UI hiển thị trong Expired Mails / Replied section
 
 ### Test 5: Edge Case - Expired mail ở Valid folder
+
 - [ ] Tạo mail cũ (Date > 24h) nhưng để ở `DungHan/mustRep`
 - [ ] Click "Move to Review"
 - [ ] Verify `originalCategory = "Expired"` (tính theo Date, không theo folder)
@@ -390,6 +425,7 @@ UI: Expired Mails tab (Replied section)
 - [ ] Verify file về `QuaHan/daRep/` (đúng Expired/Replied)
 
 ### Test 6: Auto-Update Original Category
+
 - [ ] Mail trong ReviewMails có OG = "Valid" (< 24h)
 - [ ] Đợi auto-update job chạy (sau 24h)
 - [ ] Verify `originalCategory` tự động update thành "Expired"
@@ -402,16 +438,16 @@ UI: Expired Mails tab (Replied section)
 
 ### Mapping Table - Move to Review
 
-| Folder nguồn | Date sent | → | Target folder | originalCategory | isReplied |
-|-------------|-----------|---|---------------|------------------|-----------|
-| DungHan/mustRep | < 24h | → | processed | Valid | true |
-| DungHan/mustRep | >= 24h | → | processed | Expired | true |
-| DungHan/rep | < 24h | → | processed | Valid | true |
-| DungHan/rep | >= 24h | → | processed | Expired | true |
-| QuaHan/chuaRep | < 24h | → | processed | Valid | true |
-| QuaHan/chuaRep | >= 24h | → | processed | Expired | true |
-| QuaHan/daRep | < 24h | → | processed | Valid | true |
-| QuaHan/daRep | >= 24h | → | processed | Expired | true |
+| Folder nguồn    | Date sent | →   | Target folder | originalCategory | isReplied |
+| --------------- | --------- | --- | ------------- | ---------------- | --------- |
+| DungHan/mustRep | < 24h     | →   | processed     | Valid            | true      |
+| DungHan/mustRep | >= 24h    | →   | processed     | Expired          | true      |
+| DungHan/rep     | < 24h     | →   | processed     | Valid            | true      |
+| DungHan/rep     | >= 24h    | →   | processed     | Expired          | true      |
+| QuaHan/chuaRep  | < 24h     | →   | processed     | Valid            | true      |
+| QuaHan/chuaRep  | >= 24h    | →   | processed     | Expired          | true      |
+| QuaHan/daRep    | < 24h     | →   | processed     | Valid            | true      |
+| QuaHan/daRep    | >= 24h    | →   | processed     | Expired          | true      |
 
 **Kết luận:** **TẤT CẢ** → `processed` + `isReplied = true`
 
@@ -419,10 +455,10 @@ UI: Expired Mails tab (Replied section)
 
 ### Mapping Table - Move Back
 
-| originalCategory | Review Status | → | Target Category | Target Status |
-|-----------------|---------------|---|-----------------|---------------|
-| Valid | processed | → | DungHan | rep |
-| Expired | processed | → | QuaHan | daRep |
+| originalCategory | Review Status | →   | Target Category | Target Status |
+| ---------------- | ------------- | --- | --------------- | ------------- |
+| Valid            | processed     | →   | DungHan         | rep           |
+| Expired          | processed     | →   | QuaHan          | daRep         |
 
 **Kết luận:** Vì tất cả đều `processed` → **LUÔN về Replied** (rep/daRep)
 
@@ -442,6 +478,7 @@ UI: Expired Mails tab (Replied section)
 ## 📝 Files Modified
 
 1. **Backend:**
+
    - `mail-server/server.js`
      - Line ~3370: Move to Review logic
      - Line ~3390: Calculate originalCategory

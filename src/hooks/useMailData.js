@@ -17,7 +17,7 @@ export const useMailData = () => {
     setError(null);
 
     try {
-      console.log(`🔄 Đang tải dữ liệu mail từ ${API_BASE_URL}...`);
+      console.log(`🔄 [useMailData] Loading mail data from ${API_BASE_URL}...`);
 
       // Load dữ liệu từ API server
       const response = await fetch(`${API_BASE_URL}/api/mails`);
@@ -32,17 +32,17 @@ export const useMailData = () => {
         setMails(loadedMails);
         setLoadedFromFiles(true);
         console.log(
-          `✅ Đã load ${loadedMails.length} mail từ C:\\classifyMail\\`
+          `✅ [useMailData] Successfully loaded ${loadedMails.length} mails from C:\\classifyMail\\`
         );
       } else {
         // Fallback nếu không có file nào
-        console.log("⚠️ Không tìm thấy file JSON, sử dụng fallback data");
+        console.log("⚠️ [useMailData] No files found, using fallback data");
         setMails(mockMails);
         setLoadedFromFiles(false);
       }
     } catch (err) {
       console.error(
-        "❌ Lỗi khi tải dữ liệu mail từ server, sử dụng fallback data:",
+        "❌ [useMailData] Error loading mail data from server, using fallback:",
         err
       );
       setError(err.message);
@@ -50,6 +50,7 @@ export const useMailData = () => {
       setLoadedFromFiles(false);
     } finally {
       setLoading(false);
+      console.log(`✅ [useMailData] loadData() completed`);
     }
   };
 
@@ -80,13 +81,15 @@ export const useMailData = () => {
 
     // Listen for mailsUpdated events (when files added/changed manually)
     newSocket.on("mailsUpdated", (data) => {
-      console.log("� Mails updated:", data);
+      console.log("📡 [useMailData] Mails updated event received:", data);
+      console.log("🔄 [useMailData] Triggering loadData() to fetch latest mails...");
       loadData();
     });
 
     // Listen for mailAssigned events (when auto-assignment happens)
     newSocket.on("mailAssigned", (data) => {
-      console.log("👤 Mail assigned:", data);
+      console.log("👤 [useMailData] Mail assigned event received:", data);
+      console.log("🔄 [useMailData] Triggering loadData() to fetch latest mails...");
       loadData();
     });
 

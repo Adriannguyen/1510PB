@@ -509,6 +509,9 @@ const ValidMails = () => {
 
     // Listen for mail updates
     socket.on("mailsUpdated", (data) => {
+      console.log("📡 ValidMails received mailsUpdated:", data);
+      
+      // Show alert for expired_moved specifically
       if (data.type === "expired_moved" && data.count > 0) {
         setExpiredMovedAlert({
           type: "info",
@@ -520,11 +523,12 @@ const ValidMails = () => {
         setTimeout(() => {
           setExpiredMovedAlert(null);
         }, 5000);
+      }
 
-        // Refresh mail data
-        if (refreshMails) {
-          refreshMails();
-        }
+      // Refresh mail data for ALL types (fileAdded, fileChanged, fileDeleted, etc.)
+      if (refreshMails) {
+        console.log("🔄 Refreshing ValidMails due to mailsUpdated event");
+        refreshMails();
       }
     });
 
