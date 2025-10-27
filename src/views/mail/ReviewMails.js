@@ -255,49 +255,6 @@ const ReviewMails = () => {
     }
   };
 
-  // Handle assign modal
-  const handleAssignMail = (mail) => {          // Call API to move mail back
-          const response = await fetch(
-            `${API_BASE_URL}/api/move-back-from-review`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                mailId: mail.id,
-                mailData: mail,
-              }),
-            }
-          );
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log(`✅ Mail "${mail.Subject}" moved back successfully`);
-          } else {
-            console.error(`❌ Failed to move mail "${mail.Subject}" back`);
-          }
-        } else {
-          console.log(`❌ Mail not found for ID: ${mailId}`);
-        }
-      }
-
-      // Clear selection
-      setSelectedMails([]);
-
-      // Refresh mail data
-      if (refreshMails) {
-        refreshMails();
-      }
-
-      console.log(
-        `✅ Successfully moved ${selectedMails.length} mail(s) back to original location`
-      );
-    } catch (error) {
-      console.error("❌ Error moving selected mails back:", error);
-    }
-  };
-
   // Helper function to truncate text
   const truncateText = (text, maxLength) => {
     if (!text) return "";

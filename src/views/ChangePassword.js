@@ -162,7 +162,6 @@ const ChangePassword = () => {
     setIsChanging(true);
 
     try {
-<<<<<<< HEAD
       const response = await fetch(
         `${API_BASE_URL}/api/users/${user.username}/change-password`,
         {
@@ -176,68 +175,6 @@ const ChangePassword = () => {
           }),
         }
       );
-=======
-      // Use updateUser from AuthContext (same as Profile.js)
-      const result = await updateUser({
-        username: user.username,
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-      });
-
-      if (result.success) {
-        setMessage({
-          type: "success",
-          text: "Password changed successfully! You can now login with your new password.",
-        });
-        // Clear form
-        setPasswordData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-        setPasswordStrength({ score: 0, text: "", color: "" });
-      } else {
-        setMessage({
-          type: "danger",
-          text: result.error || "Failed to change password",
-        });
-      }
-    } catch (error) {
-      console.error("Error changing password:", error);
-      setMessage({
-        type: "danger",
-        text: "An error occurred while changing password. Please try again.",
-      });
-    } finally {
-      setIsChanging(false);
-    }
-  };
-
-  // Old implementation (hidden) - Direct API call approach
-  // This code is commented out to preserve the original implementation
-  /*
-  const handlePasswordChangeOld = async (e) => {
-    e.preventDefault();
-    setMessage({ type: "", text: "" });
-
-    if (!validatePasswordChange()) {
-      return;
-    }
-
-    setIsChanging(true);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/users/${user.username}/change-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-        }),
-      });
->>>>>>> c60f2993ad775ada0a775ccda1f1abcd3496cd30
 
       const data = await response.json();
 
@@ -269,7 +206,6 @@ const ChangePassword = () => {
       setIsChanging(false);
     }
   };
-  */
 
   const handleCancel = () => {
     setPasswordData({
@@ -395,12 +331,8 @@ const ChangePassword = () => {
                         </small>
                       )}
                       <small className="text-muted mt-1 d-block">
-<<<<<<< HEAD
                         Use 8+ characters with a mix of letters, numbers &
                         symbols
-=======
-                        Use 6+ characters with a mix of letters, numbers & symbols
->>>>>>> c60f2993ad775ada0a775ccda1f1abcd3496cd30
                       </small>
                     </FormGroup>
 

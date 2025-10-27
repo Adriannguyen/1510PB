@@ -41,13 +41,9 @@ const AboutUsModal = ({ isOpen, toggle }) => {
                   marginBottom: "12px",
                 }}
               />
-<<<<<<< HEAD
               <h4 className="mb-0 font-weight-bold text-primary">
                 MAIL SYSTEM
               </h4>
-=======
-              <h4 className="mb-0 font-weight-bold text-primary">PROMPT BOX</h4>
->>>>>>> c60f2993ad775ada0a775ccda1f1abcd3496cd30
             </div>
           </div>
 
@@ -66,16 +62,11 @@ const AboutUsModal = ({ isOpen, toggle }) => {
             >
               PROMPT BOX
             </h5>
-<<<<<<< HEAD
             <p
               className="mb-3 text-muted font-weight-600"
               style={{ fontSize: "0.875rem" }}
             >
               Nguyễn Phú Đức
-=======
-            <p className="mb-3 text-muted font-weight-600" style={{ fontSize: "0.875rem" }}>
-              AI-driven Mail System
->>>>>>> c60f2993ad775ada0a775ccda1f1abcd3496cd30
             </p>
 
             <div className="mb-0">
